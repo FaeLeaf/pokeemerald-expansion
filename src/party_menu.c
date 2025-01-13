@@ -1281,9 +1281,9 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         return;
     case PARTY_SIZE: // Confirm
         if (animNum == 0)
-            SetBgTilemapPalette(1, 23, 16, 7, 2, 1);
-        else
-            SetBgTilemapPalette(1, 23, 16, 7, 2, 2);
+            SetBgTilemapPalette(1, 23, 16, 7, 4, 1);
+        else//              ?, left, top, width, height, ?
+            SetBgTilemapPalette(1, 23, 16, 7, 4, 2);
         spriteId = sPartyMenuInternal->spriteIdConfirmPokeball;
         break;
     case PARTY_SIZE + 1: // Cancel
@@ -1291,17 +1291,17 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         if (!sPartyMenuInternal->chooseHalf)
         {
             if (animNum == 0)
-                SetBgTilemapPalette(1, 23, 17, 7, 2, 1);
-            else
-                SetBgTilemapPalette(1, 23, 17, 7, 2, 2);
+                SetBgTilemapPalette(1, 23, 16, 7, 4, 1);
+            else//              ?, left, top, width, height, ?
+                SetBgTilemapPalette(1, 23, 16, 7, 4, 2);
         }
         else if (animNum == 0)
-        {
-            SetBgTilemapPalette(1, 23, 18, 7, 2, 1);
+        {//                ?, left, top, width, height, ?
+            SetBgTilemapPalette(1, 23, 17, 7, 4, 1);
         }
         else
-        {
-            SetBgTilemapPalette(1, 23, 18, 7, 2, 2);
+        {//                ?, left, top, width, height, ?
+            SetBgTilemapPalette(1, 23, 17, 7, 4, 2);
         }
         spriteId = sPartyMenuInternal->spriteIdCancelPokeball;
         break;
@@ -2218,7 +2218,11 @@ static void InitPartyMenuWindows(u8 layout)
     switch (layout)
     {
     case PARTY_LAYOUT_SINGLE:
+<<<<<<< Updated upstream
         InitWindows(sSinglePartyMenuWindowTemplate);
+=======
+        InitWindows(sSinglePartyMenuWindowTemplate_Equal); //sSinglePartyMenuWindowTemplate
+>>>>>>> Stashed changes
         break;
     case PARTY_LAYOUT_DOUBLE:
         InitWindows(sDoublePartyMenuWindowTemplate);
@@ -2338,9 +2342,37 @@ static void BlitBitmapToPartyWindow_RightColumn(u8 windowId, u8 x, u8 y, u8 widt
 
 static void DrawEmptySlot(u8 windowId)
 {
+<<<<<<< Updated upstream
     BlitBitmapToPartyWindow(windowId, sSlotTilemap_WideEmpty, 18, 0, 0, 18, 3);
 }
 
+=======
+    if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE) //Custom party menu
+        BlitBitmapToPartyWindow(windowId, sEqualEmptySlotTileNums, 15, 0, 0, 15, 5);//
+    else
+        BlitBitmapToPartyWindow(windowId, sEmptySlotTileNums, 18, 0, 0, 18, 3);
+}
+
+//Custom party menu
+static void BlitBitmapToPartyWindow_Equal(u8 windowId, u8 x, u8 y, u8 width, u8 height, u8 isEgg)
+{
+    if (width == 0 && height == 0)
+    {
+        width = 15;
+        height = 5;
+    }
+    if (isEgg == FALSE)
+        BlitBitmapToPartyWindow(windowId, sEqualMainSlotTileNums, 15, x, y, width, height);
+    else
+        BlitBitmapToPartyWindow(windowId, sEqualMainSlotTileNums_Egg, 15, x, y, width, height);
+}
+
+static void DrawEmptySlot_Equal(u8 windowId)
+{
+    BlitBitmapToPartyWindow(windowId, sEqualEmptySlotTileNums, 15, 0, 0, 15, 5);
+}//
+
+>>>>>>> Stashed changes
 #define LOAD_PARTY_BOX_PAL(paletteIds, paletteOffsets)                                                    \
 {                                                                                                         \
     LoadPalette(GetPartyMenuPalBufferPtr(paletteIds[0]), paletteOffsets[0] + palOffset, PLTT_SIZEOF(1));  \

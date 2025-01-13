@@ -35,30 +35,45 @@ static const struct PartyMenuBoxInfoRects sPartyBoxInfoRects[] =
     {
         BlitBitmapToPartyWindow_LeftColumn,
         {
-            //The below are the x, y, width, and height for each of the following info
-            24, 11, 40, 13, // Nickname
-            32, 20, 32,  8, // Level
-            64, 20,  8,  8, // Gender
-            38, 37, 24,  8, // HP
-            53, 37, 24,  8, // Max HP
-            24, 35, 48,  3  // HP bar
+            24, 11, 40, 13,
+            32, 20, 32,  8,
+            64, 20,  8,  8,
+            38, 37, 24,  8,
+            53, 37, 24,  8,
+            24, 35, 48,  3
         },
-        12, 34, 64, 16      // Description text (e.g. NO USE)
+            12, 34, 64, 16
     },
     [PARTY_BOX_RIGHT_COLUMN] =
     {
         BlitBitmapToPartyWindow_RightColumn,
         {
-             // See above comment
-             22,  3, 40, 13, // Nickname
-             30, 12, 32,  8, // Level
-             62, 12,  8,  8, // Gender
-            102, 12, 24,  8, // HP
-            117, 12, 24,  8, // Max HP
-             88, 10, 48,  3  // HP bar
+             22,  3, 40, 13,
+             30, 12, 32,  8,
+             62, 12,  8,  8,
+            102, 12, 24,  8,
+            117, 12, 24,  8,
+             88, 10, 48,  3
         },
-        77, 4, 64, 16        // Description text
+             77, 4, 64, 16
     },
+<<<<<<< Updated upstream
+=======
+        [PARTY_BOX_EQUAL_COLUMN] = //Custom party menu
+    {
+        BlitBitmapToPartyWindow_Equal, 
+        {
+            //The below are the x, y, width, and height for each of the following info
+            32, 04, 40, 16, // Nickname
+             8, 20, 32,  8, // Level
+            24,  4,  8,  8, // Gender
+            56, 13, 24, 16, // HP
+            80, 13, 24, 16, // Max HP
+            55, 28, 56,  2  // HP bar
+        }, 
+            33, 13, 64, 16  // Description text (e.g. NO USE)
+    },//
+>>>>>>> Stashed changes
 };
 
 
@@ -69,12 +84,21 @@ static const u8 sPartyMenuSpriteCoords[PARTY_LAYOUT_COUNT][PARTY_SIZE][4 * 2] =
 {
     [PARTY_LAYOUT_SINGLE] =
     {
+<<<<<<< Updated upstream
         { 16,  40,  20,  50,  50,  52,  16,  34},
         {104,  18, 108,  28, 136,  27, 102,  25},
         {104,  42, 108,  52, 136,  51, 102,  49},
         {104,  66, 108,  76, 136,  75, 102,  73},
         {104,  90, 108, 100, 136,  99, 102,  97},
         {104, 114, 108, 124, 136, 123, 102, 121},
+=======
+        { 16,  14,  28,  20, 44,  20,  16,  10},
+        {136,  22, 148,  28, 164,  28, 28,  18},
+        { 16,  54,  28,  60, 44,  60,  16,  50},
+        {136,  62, 148,  68, 164,  68, 28,  58},
+        { 16,  94,  28, 100, 44, 100,  16,  90},
+        {136, 102, 148, 108, 164, 108, 128, 98},
+>>>>>>> Stashed changes
     },
     [PARTY_LAYOUT_DOUBLE] =
     {
@@ -112,12 +136,12 @@ static const u32 sCancelButton_Tilemap[] = INCBIN_U32("graphics/party_menu/cance
 // Text colors for BG, FG, and Shadow in that order
 static const u8 sFontColorTable[][3] =
 {
-    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_DARK_GRAY},  // Default
-    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_GREEN},      // Unused
-    {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_2,  TEXT_DYNAMIC_COLOR_3},  // Gender symbol
-    {TEXT_COLOR_WHITE,       TEXT_COLOR_DARK_GRAY,  TEXT_COLOR_LIGHT_GRAY}, // Selection actions
-    {TEXT_COLOR_WHITE,       TEXT_COLOR_BLUE,       TEXT_COLOR_LIGHT_BLUE}, // Field moves
-    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_DARK_GRAY},  // Unused
+    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY,  TEXT_COLOR_TRANSPARENT}, // Default
+    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_TRANSPARENT}, // Unused
+    {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_2,  TEXT_COLOR_TRANSPARENT}, // Gender symbol
+    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY,  TEXT_COLOR_TRANSPARENT}, // Selection actions
+    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_BLUE,       TEXT_COLOR_TRANSPARENT}, // Field moves
+    {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_TRANSPARENT}, // Unused
 };
 
 static const struct WindowTemplate sSinglePartyMenuWindowTemplate[] =
@@ -394,6 +418,20 @@ static const struct WindowTemplate sCancelButtonWindowTemplate =
     .baseBlock = 0x1C7,
 };
 
+<<<<<<< Updated upstream
+=======
+static const struct WindowTemplate sCancelButtonWindowTemplate_equal =
+{
+    .bg = 0,
+    .tilemapLeft = 24,
+    .tilemapTop = 17,
+    .width = 6,
+    .height = 2,
+    .paletteNum = 3,
+    .baseBlock = 549  //Custom party menu
+};
+
+>>>>>>> Stashed changes
 static const struct WindowTemplate sMultiCancelButtonWindowTemplate =
 {
     .bg = 0,
@@ -405,6 +443,20 @@ static const struct WindowTemplate sMultiCancelButtonWindowTemplate =
     .baseBlock = 0x1C7,
 };
 
+<<<<<<< Updated upstream
+=======
+static const struct WindowTemplate sMultiCancelButtonWindowTemplate_equal =
+{
+    .bg = 0,
+    .tilemapLeft = 24,
+    .tilemapTop = 18,
+    .width = 6,
+    .height = 2,
+    .paletteNum = 3,
+    .baseBlock = 561  //Custom party menu
+};
+
+>>>>>>> Stashed changes
 static const struct WindowTemplate sConfirmButtonWindowTemplate =
 {
     .bg = 0,
@@ -416,6 +468,20 @@ static const struct WindowTemplate sConfirmButtonWindowTemplate =
     .baseBlock = 0x1D3,
 };
 
+<<<<<<< Updated upstream
+=======
+static const struct WindowTemplate sConfirmButtonWindowTemplate_equal =
+{
+    .bg = 0,
+    .tilemapLeft = 24,
+    .tilemapTop = 16,
+    .width = 6,
+    .height = 2,
+    .paletteNum = 3,
+    .baseBlock = 0x213,  //Custom party menu
+};
+
+>>>>>>> Stashed changes
 static const struct WindowTemplate sDefaultPartyMsgWindowTemplate =
 {
     .bg = 2,
@@ -601,6 +667,33 @@ static const u8 sSlotTilemap_Wide[]      = INCBIN_U8("graphics/party_menu/slot_w
 static const u8 sSlotTilemap_WideNoHP[]  = INCBIN_U8("graphics/party_menu/slot_wide_no_hp.bin");
 static const u8 sSlotTilemap_WideEmpty[] = INCBIN_U8("graphics/party_menu/slot_wide_empty.bin");
 
+<<<<<<< Updated upstream
+=======
+ //Custom party menu
+static const u8 sEqualMainSlotTileNums[] =     {20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 22,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                28, 02, 02, 02, 02, 04, 05, 06, 06, 06, 06, 06, 06, 07, 30,
+                                                36, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 38};
+
+static const u8 sEqualMainSlotTileNums_Egg[] = {20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 22,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                36, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 38};
+
+static const u8 sEqualEmptySlotTileNums[] =    {20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 22,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                28, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 30,
+                                                36, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 38};
+
+static const u8 sEmptySlotTileNums[] = {21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23,
+                                        30, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 02, 31,
+                                        37, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 39};
+//
+
+>>>>>>> Stashed changes
 // Palette offsets
 static const u8 sGenderPalOffsets[] = {11, 12};
 static const u8 sHPBarPalOffsets[] = {9, 10};
