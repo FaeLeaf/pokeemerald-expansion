@@ -393,8 +393,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
 {
     [PSS_LABEL_WINDOW_POKEMON_INFO_TITLE] = {
         .bg = 0,
-        .tilemapLeft = 0,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 11,
         .height = 2,
         .paletteNum = 6,
@@ -402,8 +402,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_POKEMON_SKILLS_TITLE] = {
         .bg = 0,
-        .tilemapLeft = 0,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 11,
         .height = 2,
         .paletteNum = 6,
@@ -411,8 +411,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_BATTLE_MOVES_TITLE] = {
         .bg = 0,
-        .tilemapLeft = 0,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 11,
         .height = 2,
         .paletteNum = 6,
@@ -420,8 +420,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_CONTEST_MOVES_TITLE] = {
         .bg = 0,
-        .tilemapLeft = 0,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 11,
         .height = 2,
         .paletteNum = 6,
@@ -429,8 +429,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_PROMPT_CANCEL] = {
         .bg = 0,
-        .tilemapLeft = 22,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 8,
         .height = 2,
         .paletteNum = 7,
@@ -438,8 +438,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_PROMPT_INFO] = {
         .bg = 0,
-        .tilemapLeft = 22,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 8,
         .height = 2,
         .paletteNum = 7,
@@ -447,8 +447,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_PROMPT_SWITCH] = {
         .bg = 0,
-        .tilemapLeft = 22,
-        .tilemapTop = 0,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 8,
         .height = 2,
         .paletteNum = 7,
@@ -456,8 +456,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_UNUSED1] = {
         .bg = 0,
-        .tilemapLeft = 11,
-        .tilemapTop = 4,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
         .width = 0,
         .height = 2,
         .paletteNum = 6,
@@ -474,9 +474,9 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_POKEMON_INFO_TYPE] = {
         .bg = 0,
-        .tilemapLeft = 11,
-        .tilemapTop = 6,
-        .width = 18,
+        .tilemapLeft = 1,
+        .tilemapTop = 10,
+        .width = 5,
         .height = 2,
         .paletteNum = 6,
         .baseBlock = 173,
@@ -555,17 +555,17 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_PORTRAIT_NICKNAME] = {
         .bg = 0,
-        .tilemapLeft = 1,
-        .tilemapTop = 12,
+        .tilemapLeft = 12,
+        .tilemapTop = 2,
         .width = 9,
         .height = 2,
-        .paletteNum = 6,
+        .paletteNum = 1,
         .baseBlock = 413,
     },
     [PSS_LABEL_WINDOW_PORTRAIT_SPECIES] = {
         .bg = 0,
-        .tilemapLeft = 1,
-        .tilemapTop = 14,
+        .tilemapLeft = 12,
+        .tilemapTop = 4,
         .width = 9,
         .height = 4,
         .paletteNum = 6,
@@ -577,17 +577,17 @@ static const struct WindowTemplate sPageInfoTemplate[] =
 {
     [PSS_DATA_WINDOW_INFO_ORIGINAL_TRAINER] = {
         .bg = 0,
-        .tilemapLeft = 11,
-        .tilemapTop = 4,
-        .width = 11,
-        .height = 2,
+        .tilemapLeft = 20,
+        .tilemapTop = 10,
+        .width = 10,
+        .height = 4,
         .paletteNum = 6,
         .baseBlock = 467,
     },
     [PSS_DATA_WINDOW_INFO_ID] = {
         .bg = 0,
-        .tilemapLeft = 22,
-        .tilemapTop = 4,
+        .tilemapLeft = 0,
+        .tilemapTop = 0,
         .width = 7,
         .height = 2,
         .paletteNum = 6,
@@ -595,16 +595,16 @@ static const struct WindowTemplate sPageInfoTemplate[] =
     },
     [PSS_DATA_WINDOW_INFO_ABILITY] = {
         .bg = 0,
-        .tilemapLeft = 11,
-        .tilemapTop = 9,
-        .width = 18,
-        .height = 4,
+        .tilemapLeft = 30,
+        .tilemapTop = 20,
+        .width = 12,
+        .height = 6,
         .paletteNum = 6,
         .baseBlock = 503,
     },
     [PSS_DATA_WINDOW_INFO_MEMO] = {
         .bg = 0,
-        .tilemapLeft = 11,
+        .tilemapLeft = 1,
         .tilemapTop = 14,
         .width = 18,
         .height = 6,
@@ -778,11 +778,32 @@ static const union AnimCmd sSpriteAnim_CategoryIcon2[] =
     ANIMCMD_END
 };
 
+static const union AnimCmd sSpriteAnim_CategoryIcon3[] =
+{
+    ANIMCMD_FRAME(12, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_CategoryIcon4[] =
+{
+    ANIMCMD_FRAME(16, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_CategoryIcon5[] =
+{
+    ANIMCMD_FRAME(20, 0),
+    ANIMCMD_END
+};
+
 static const union AnimCmd *const sSpriteAnimTable_CategoryIcons[] =
 {
     sSpriteAnim_CategoryIcon0,
     sSpriteAnim_CategoryIcon1,
     sSpriteAnim_CategoryIcon2,
+    sSpriteAnim_CategoryIcon3,
+    sSpriteAnim_CategoryIcon4,
+    sSpriteAnim_CategoryIcon5,
 };
 
 const struct SpriteTemplate gSpriteTemplate_CategoryIcons =
@@ -3045,7 +3066,7 @@ static void PrintPageNamesAndStats(void)
     PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, gText_Accuracy2, 0, 17, 0, 1);
     PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_APPEAL_JAM, gText_Appeal, 0, 1, 0, 1);
     PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_APPEAL_JAM, gText_Jam, 0, 17, 0, 1);
-    PrintTextOnWindowWithFont(PSS_LABEL_WINDOW_PROMPT_RELEARN, gText_Relearn, 0, 4, 0, 0, FONT_SMALL);
+    PrintTextOnWindowWithFont(PSS_LABEL_WINDOW_PROMPT_RELEARN, gText_Relearn, 0, 4, 0, 0, FONT_NORMAL);
 }
 
 static void PutPageWindowTilemaps(u8 page)
@@ -4023,10 +4044,10 @@ static void SetMonTypeIcons(void)
     }
     else
     {
-        SetTypeSpritePosAndPal(gSpeciesInfo[summary->species].types[0], 120, 48, SPRITE_ARR_ID_TYPE);
+        SetTypeSpritePosAndPal(gSpeciesInfo[summary->species].types[0], 24, 96, SPRITE_ARR_ID_TYPE);
         if (gSpeciesInfo[summary->species].types[0] != gSpeciesInfo[summary->species].types[1])
         {
-            SetTypeSpritePosAndPal(gSpeciesInfo[summary->species].types[1], 160, 48, SPRITE_ARR_ID_TYPE + 1);
+            SetTypeSpritePosAndPal(gSpeciesInfo[summary->species].types[1], 60, 96, SPRITE_ARR_ID_TYPE + 1);
             SetSpriteInvisibility(SPRITE_ARR_ID_TYPE + 1, FALSE);
         }
         else
