@@ -1172,7 +1172,7 @@ static void DisplayPartyPokemonDataForMultiBattle(u8 slot)
 
     if (gMultiPartnerParty[actualSlot].species == SPECIES_NONE)
     {
-        DrawEmptySlot(menuBox->windowId);
+        DrawEmptySlot_Equal(menuBox->windowId); //Xyifer: I changed this from DrawEmptySlot just to get rid of the warning nagging me about unused functions.
     }
     else
     {
@@ -1281,9 +1281,9 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         return;
     case PARTY_SIZE: // Confirm
         if (animNum == 0)
-            SetBgTilemapPalette(1, 23, 16, 7, 2, 1);
+            SetBgTilemapPalette(1, 22, 16, 8, 4, 1);
         else
-            SetBgTilemapPalette(1, 23, 16, 7, 2, 2);
+            SetBgTilemapPalette(1, 22, 16, 8, 4, 2);
         spriteId = sPartyMenuInternal->spriteIdConfirmPokeball;
         break;
     case PARTY_SIZE + 1: // Cancel
@@ -1291,17 +1291,17 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         if (!sPartyMenuInternal->chooseHalf)
         {
             if (animNum == 0)
-                SetBgTilemapPalette(1, 23, 17, 7, 2, 1);
+                SetBgTilemapPalette(1, 22, 16, 8, 4, 1);
             else
-                SetBgTilemapPalette(1, 23, 17, 7, 2, 2);
+                SetBgTilemapPalette(1, 22, 16, 8, 4, 2);
         }
         else if (animNum == 0)
         {
-            SetBgTilemapPalette(1, 23, 18, 7, 2, 1);
+            SetBgTilemapPalette(1, 22, 18, 8, 4, 1);
         }
         else
         {
-            SetBgTilemapPalette(1, 23, 18, 7, 2, 2);
+            SetBgTilemapPalette(1, 22, 18, 8, 4, 2);
         }
         spriteId = sPartyMenuInternal->spriteIdCancelPokeball;
         break;
@@ -2330,14 +2330,14 @@ static void CreateCancelConfirmWindows(bool8 chooseHalf)
             else
                 confirmWindowId = AddWindow(&sConfirmButtonWindowTemplate);
             FillWindowPixelBuffer(confirmWindowId, PIXEL_FILL(0));
-            mainOffset = GetStringCenterAlignXOffset(FONT_NORMAL, gMenuText_Confirm, 48);
+            mainOffset = GetStringCenterAlignXOffset(FONT_NORMAL, gMenuText_Confirm, 0);
             AddTextPrinterParameterized4(confirmWindowId, FONT_NORMAL, mainOffset, 1, 0, 0, sFontColorTable[0], TEXT_SKIP_DRAW, gMenuText_Confirm);
             PutWindowTilemap(confirmWindowId);
             CopyWindowToVram(confirmWindowId, COPYWIN_GFX);
             cancelWindowId = AddWindow(&sMultiCancelButtonWindowTemplate);
             offset = 0;
         }
-                else if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE)
+        else if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE)
         {
             cancelWindowId = AddWindow(&sCancelButtonWindowTemplate_equal);
             offset = 3;
@@ -2352,12 +2352,12 @@ static void CreateCancelConfirmWindows(bool8 chooseHalf)
         // Branches are functionally identical. Second branch is never reached, Spin Trade wasnt fully implemented
         if (gPartyMenu.menuType != PARTY_MENU_TYPE_SPIN_TRADE)
         {
-            mainOffset = GetStringCenterAlignXOffset(FONT_NORMAL, gText_Cancel, 48);
+            mainOffset = GetStringCenterAlignXOffset(FONT_NORMAL, gText_Cancel, 0);
             AddTextPrinterParameterized3(cancelWindowId, FONT_NORMAL, mainOffset + offset, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gText_Cancel);
         }
         else
         {
-            mainOffset = GetStringCenterAlignXOffset(FONT_NORMAL, gText_Cancel2, 48);
+            mainOffset = GetStringCenterAlignXOffset(FONT_NORMAL, gText_Cancel2, 0);
             AddTextPrinterParameterized3(cancelWindowId, FONT_NORMAL, mainOffset + offset, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gText_Cancel2);
         }
         PutWindowTilemap(cancelWindowId);
@@ -2417,28 +2417,26 @@ static void BlitBitmapToPartyWindow_RightColumn(u8 windowId, u8 x, u8 y, u8 widt
 static void DrawEmptySlot(u8 windowId)
 {
     if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE) //Custom party menu
-        BlitBitmapToPartyWindow(windowId, sEqualEmptySlotTileNums, 14, 0, 0, 14, 5);//
+        BlitBitmapToPartyWindow(windowId, sEqualEmptySlotTileNums, 15, 0, 0, 15, 5);//
     else
         BlitBitmapToPartyWindow(windowId, sEmptySlotTileNums, 18, 0, 0, 18, 3);
 }
-
 //Custom party menu
 static void BlitBitmapToPartyWindow_Equal(u8 windowId, u8 x, u8 y, u8 width, u8 height, u8 isEgg)
 {
     if (width == 0 && height == 0)
     {
-        width = 14;
+        width = 15;
         height = 5;
     }
     if (isEgg == FALSE)
-        BlitBitmapToPartyWindow(windowId, sEqualMainSlotTileNums, 14, x, y, width, height);
+        BlitBitmapToPartyWindow(windowId, sEqualMainSlotTileNums, 15, x, y, width, height);
     else
-        BlitBitmapToPartyWindow(windowId, sEqualMainSlotTileNums_Egg, 14, x, y, width, height);
+        BlitBitmapToPartyWindow(windowId, sEqualMainSlotTileNums_Egg, 15, x, y, width, height);
 }
-
 static void DrawEmptySlot_Equal(u8 windowId)
 {
-    BlitBitmapToPartyWindow(windowId, sEqualEmptySlotTileNums, 14, 0, 0, 14, 5);
+    BlitBitmapToPartyWindow(windowId, sEqualEmptySlotTileNums, 15, 0, 0, 15, 5);
 }//
 
 #define LOAD_PARTY_BOX_PAL(paletteIds, paletteOffsets)                                                    \
@@ -2530,6 +2528,11 @@ static void DisplayPartyPokemonBarDetail(u8 windowId, const u8 *str, u8 color, c
     AddTextPrinterParameterized3(windowId, FONT_NORMAL, align[0], align[1], sFontColorTable[color], 0, str);
 }
 
+static void DisplayPartyPokemonBarDetailToFit(u8 windowId, const u8 *str, u8 color, const u8 *align, u32 width)
+{
+    AddTextPrinterParameterized3(windowId, GetFontIdToFit(str, FONT_NORMAL, 0, width), align[0], align[1], sFontColorTable[color], 0, str);
+}
+
 static void DisplayPartyPokemonBarDetail2(u8 windowId, const u8 *str, u8 color, const u8 *align)
 {
     if (gPartyMenu.layout != PARTY_LAYOUT_SINGLE)
@@ -2538,11 +2541,6 @@ static void DisplayPartyPokemonBarDetail2(u8 windowId, const u8 *str, u8 color, 
         return;
     }
     AddTextPrinterParameterized3(windowId, FONT_NORMAL, align[0] + 4, align[1], sFontColorTable[color], 0, str);
-}
-
-static void DisplayPartyPokemonBarDetailToFit(u8 windowId, const u8 *str, u8 color, const u8 *align, u32 width)
-{
-    AddTextPrinterParameterized3(windowId, GetFontIdToFit(str, FONT_NORMAL, 0, width), align[0], align[1], sFontColorTable[color], 0, str);
 }
 
 static void DisplayPartyPokemonNickname(struct Pokemon *mon, struct PartyMenuBox *menuBox, u8 c)
@@ -2713,8 +2711,8 @@ static void DisplayPartyPokemonDescriptionText(u8 stringID, struct PartyMenuBox 
 {
     if (c)
     {
-        int width = ((menuBox->infoRects->descTextLeft % 8) + menuBox->infoRects->descTextWidth + 7) / 8 - 1;
-        int height = ((menuBox->infoRects->descTextTop % 8) + menuBox->infoRects->descTextHeight + 7) / 8 - 1;
+        int width = ((menuBox->infoRects->descTextLeft % 8 - 1) + menuBox->infoRects->descTextWidth + 7) / 8;
+        int height = ((menuBox->infoRects->descTextTop % 8 - 1) + menuBox->infoRects->descTextHeight + 7) / 8;
         menuBox->infoRects->blitFunc(menuBox->windowId, menuBox->infoRects->descTextLeft >> 3, (menuBox->infoRects->descTextTop >> 3)+1, width, height, TRUE);
     }
     if (c != 2)
@@ -3152,6 +3150,7 @@ static void SwitchSelectedMons(u8 taskId)
         tSlot2Top = GetWindowAttribute(windowIds[1], WINDOW_TILEMAP_TOP);
         tSlot2Width = GetWindowAttribute(windowIds[1], WINDOW_WIDTH);
         tSlot2Height = GetWindowAttribute(windowIds[1], WINDOW_HEIGHT);
+        tSlot2BaseBlock = GetWindowAttribute(windowIds[1], WINDOW_BASE_BLOCK);  //Custom party menu
         tSlot2Offset = 0;
         if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE && (tSlot2BaseBlock == 0x63 || tSlot2BaseBlock == 0xEF || tSlot2BaseBlock == 0x17B)) //Custom party menu
             tSlot2SlideDir = -1;
@@ -4322,9 +4321,9 @@ static void SpriteCB_BouncePartyMonIcon(struct Sprite *sprite)
     if (animCmd != 0)
     {
         if (animCmd & 1) // % 2 also matches
-            sprite->y2 = -3;
+            sprite->y2 = 0;
         else
-            sprite->y2 = 1;
+            sprite->y2 = 0;
     }
 }
 
