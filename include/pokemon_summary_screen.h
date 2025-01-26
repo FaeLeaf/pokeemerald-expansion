@@ -35,9 +35,11 @@ enum PokemonSummaryScreenMode
 enum PokemonSummaryScreenPage
 {
     PSS_PAGE_INFO,
+    PSS_PAGE_GREEN,
     PSS_PAGE_SKILLS,
     PSS_PAGE_BATTLE_MOVES,
     PSS_PAGE_CONTEST_MOVES,
+    PSS_PAGE_RIBBONS,
     PSS_PAGE_COUNT,
 };
 
