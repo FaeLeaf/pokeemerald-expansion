@@ -502,7 +502,7 @@ const struct Ability gAbilitiesInfo[ABILITIES_COUNT] =
     [ABILITY_BLAZE] =
     {
         .name = _("Blaze"),
-        .description = COMPOUND_STRING("Ups Fire moves in a pinch."),
+        .description = COMPOUND_STRING("Powers up FIRE moves in a pinch."),
         .aiRating = 5,
     },
 
