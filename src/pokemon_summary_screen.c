@@ -400,8 +400,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT] = {
         .bg = 0,
-        .tilemapLeft = 10,
-        .tilemapTop = 10,
+        .tilemapLeft = 5,
+        .tilemapTop = 12,
         .width = 8,
         .height = 6,
         .paletteNum = 0,
@@ -409,8 +409,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT] = {
         .bg = 0,
-        .tilemapLeft = 20,
-        .tilemapTop = 10,
+        .tilemapLeft = 15,
+        .tilemapTop = 12,
         .width = 8,
         .height = 6,
         .paletteNum = 0,
@@ -545,8 +545,8 @@ static const struct WindowTemplate sPageSkillsTemplate[] =
 {
     [PSS_DATA_WINDOW_SKILLS_STATS_LEFT] = {
         .bg = 0,
-        .tilemapLeft = 16,
-        .tilemapTop = 7,
+        .tilemapLeft = 27,
+        .tilemapTop = 8,
         .width = 6,
         .height = 6,
         .paletteNum = 0,
@@ -555,7 +555,7 @@ static const struct WindowTemplate sPageSkillsTemplate[] =
     [PSS_DATA_WINDOW_SKILLS_STATS_RIGHT] = {
         .bg = 0,
         .tilemapLeft = 27,
-        .tilemapTop = 7,
+        .tilemapTop = 14,
         .width = 3,
         .height = 6,
         .paletteNum = 0,
@@ -567,7 +567,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
     [PSS_DATA_WINDOW_MOVE_NAMES] = {
         .bg = 0,
         .tilemapLeft = 15,
-        .tilemapTop = 4,
+        .tilemapTop = 10,
         .width = 9,
         .height = 10,
         .paletteNum = 0,
@@ -576,7 +576,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
     [PSS_DATA_WINDOW_MOVE_PP] = {
         .bg = 0,
         .tilemapLeft = 24,
-        .tilemapTop = 4,
+        .tilemapTop = 10,
         .width = 6,
         .height = 10,
         .paletteNum = 0,
@@ -585,7 +585,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
     [PSS_DATA_WINDOW_MOVE_DESCRIPTION] = {
         .bg = 0,
         .tilemapLeft = 10,
-        .tilemapTop = 15,
+        .tilemapTop = 20,
         .width = 20,
         .height = 4,
         .paletteNum = 0,
@@ -2757,12 +2757,12 @@ static void PrintTextOnWindowWithFont(u8 windowId, const u8 *string, u8 x, u8 y,
 
 static void PrintTextOnWindow(u8 windowId, const u8 *string, u8 x, u8 y, u8 lineSpacing, u8 colorId)
 {
-    PrintTextOnWindowWithFont(windowId, string, x, y, lineSpacing, colorId, FONT_NORMAL);
+    PrintTextOnWindowWithFont(windowId, string, x, y, lineSpacing, colorId, FONT_SMALL);
 }
 
 static void PrintTextOnWindowToFitPx(u8 windowId, const u8 *string, u8 x, u8 y, u8 lineSpacing, u8 colorId, u32 width)
 {
-    u32 fontId = GetFontIdToFit(string, FONT_NORMAL, 0, width);
+    u32 fontId = GetFontIdToFit(string, FONT_SMALL, 0, width);
     PrintTextOnWindowWithFont(windowId, string, x, y, lineSpacing, colorId, fontId);
 }
 
@@ -2871,20 +2871,16 @@ static void PrintPageNamesAndStats(void)
     if (iconXPos < 0)
         iconXPos = 0;
 
+    //statsXPos = 0;
+
     PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_INFO_RENTAL, gText_RentalPkmn, 0, 1, 0, 1);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_INFO_TYPE, gText_TypeSlash, 0, 1, 0, 0);
-    statsXPos = 6 + GetStringCenterAlignXOffset(FONT_NORMAL, gText_HP4, 42);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT, gText_HP4, statsXPos, 1, 0, 1);
-    statsXPos = 6 + GetStringCenterAlignXOffset(FONT_NORMAL, gText_Attack3, 42);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT, gText_Attack3, statsXPos, 17, 0, 1);
-    statsXPos = 6 + GetStringCenterAlignXOffset(FONT_NORMAL, gText_Defense3, 42);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT, gText_Defense3, statsXPos, 33, 0, 1);
-    statsXPos = 2 + GetStringCenterAlignXOffset(FONT_NORMAL, gText_SpAtk4, 36);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT, gText_SpAtk4, statsXPos, 1, 0, 1);
-    statsXPos = 2 + GetStringCenterAlignXOffset(FONT_NORMAL, gText_SpDef4, 36);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT, gText_SpDef4, statsXPos, 17, 0, 1);
-    statsXPos = 2 + GetStringCenterAlignXOffset(FONT_NORMAL, gText_Speed2, 36);
-    PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT, gText_Speed2, statsXPos, 33, 0, 1);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_INFO_TYPE,          gText_TypeSlash,        0,  1, 0, 0);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT,  gText_HP4,      statsXPos,  1, 0, 1);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT,  gText_Attack3,  statsXPos,  0, 0, 1);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_LEFT,  gText_Defense3, statsXPos, 16, 0, 1);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT, gText_SpAtk4,   statsXPos, 32, 0, 1);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT, gText_SpDef4,   statsXPos, 48, 0, 1);
+    //PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATS_RIGHT, gText_Speed2,   statsXPos, 64, 0, 1);
     PrintTextOnWindow(PSS_LABEL_WINDOW_POKEMON_SKILLS_STATUS, gText_Status, 2, 1, 0, 1);
     PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, gText_Power, 0, 1, 0, 1);
     PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, gText_Accuracy2, 0, 17, 0, 1);
@@ -3429,20 +3425,20 @@ static void BufferStat(u8 *dst, u8 statIndex, u32 stat, u32 strId, u32 n)
 
 static void BufferLeftColumnStats(void)
 {
-    u8 *currentHPString = Alloc(20);
-    u8 *maxHPString = Alloc(20);
+    //u8 *currentHPString = Alloc(20);
+    //u8 *maxHPString = Alloc(20);
     u8 *attackString = Alloc(20);
     u8 *defenseString = Alloc(20);
 
     DynamicPlaceholderTextUtil_Reset();
-    BufferStat(currentHPString, 0, sMonSummaryScreen->summary.currentHP, 0, 3);
-    BufferStat(maxHPString, 0, sMonSummaryScreen->summary.maxHP, 1, 3);
-    BufferStat(attackString, STAT_ATK, sMonSummaryScreen->summary.atk, 2, 7);
-    BufferStat(defenseString, STAT_DEF, sMonSummaryScreen->summary.def, 3, 7);
+    //BufferStat(currentHPString, 0, sMonSummaryScreen->summary.currentHP, 0, 3);
+    //BufferStat(maxHPString, 0, sMonSummaryScreen->summary.maxHP, 1, 3);
+    BufferStat(attackString, STAT_ATK, sMonSummaryScreen->summary.atk, 2, 3);
+    BufferStat(defenseString, STAT_DEF, sMonSummaryScreen->summary.def, 3, 3);
     DynamicPlaceholderTextUtil_ExpandPlaceholders(gStringVar4, sStatsLeftColumnLayout);
 
-    Free(currentHPString);
-    Free(maxHPString);
+    //Free(currentHPString);
+    //Free(maxHPString);
     Free(attackString);
     Free(defenseString);
 }
