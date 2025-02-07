@@ -495,14 +495,14 @@ const struct Ability gAbilitiesInfo[ABILITIES_COUNT] =
     [ABILITY_OVERGROW] =
     {
         .name = _("Overgrow"),
-        .description = COMPOUND_STRING("Ups Grass moves in a pinch."),
+        .description = COMPOUND_STRING("Powers up GRASS moves in\n" "a pinch."),
         .aiRating = 5,
     },
 
     [ABILITY_BLAZE] =
     {
-        .name = _("Blaze"),
-        .description = COMPOUND_STRING("Powers up FIRE moves in a pinch."),
+        .name = _("BLAZE"),
+        .description = COMPOUND_STRING("Powers up FIRE moves in\n" "a pinch."),
         .aiRating = 5,
     },
 
