@@ -369,19 +369,19 @@ struct TilemapCtrl
 static const u16 sStatusTilemap[] = INCBIN_U16("graphics/summary_screen/status_tilemap.bin");
 static const struct TilemapCtrl sStatusTilemapCtrl1 =
 {
-    sStatusTilemap, 1, 10, 2, 0, 18
+    sStatusTilemap, 1, 0, 0, 0, 18 //1, 10, 2, 0, 18
 };
 static const struct TilemapCtrl sStatusTilemapCtrl2 =
 {
-    sStatusTilemap, 1, 10, 2, 0, 50
+    sStatusTilemap, 1, 0, 0, 0, 50 //1, 10, 2, 0, 50
 };
 static const struct TilemapCtrl sBattleMoveTilemapCtrl =
 {
-    gSummaryScreen_MoveEffect_Battle_Tilemap, 0, 10, 7, 0, 45
+    gSummaryScreen_MoveEffect_Battle_Tilemap, 0, 0, 0, 0, 45 //0, 10, 7, 0, 45
 };
 static const struct TilemapCtrl sContestMoveTilemapCtrl =
 {
-    gSummaryScreen_MoveEffect_Contest_Tilemap, 0, 10, 7, 0, 45
+    gSummaryScreen_MoveEffect_Contest_Tilemap, 0, 0, 0, 0, 45 //0, 10, 7, 0, 45
 };
 static const s8 sMultiBattleOrder[] = {0, 2, 3, 1, 4, 5};
 static const struct WindowTemplate sSummaryTemplate[] =
@@ -399,7 +399,7 @@ static const struct WindowTemplate sSummaryTemplate[] =
         .bg = 0,
         .tilemapLeft = 12,
         .tilemapTop = 2,
-        .width = 10,
+        .width = 11,
         .height = 2,
         .paletteNum = 0,
         .baseBlock = 147,
@@ -411,7 +411,7 @@ static const struct WindowTemplate sSummaryTemplate[] =
         .width = 11,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 167,
+        .baseBlock = 169,
     },
     [PSS_LABEL_WINDOW_POKEMON_INFO_RENTAL] = {
         .bg = 0,
@@ -429,16 +429,16 @@ static const struct WindowTemplate sSummaryTemplate[] =
         .width = 4,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 189,
+        .baseBlock = 191,
     },
     [PSS_LABEL_WINDOW_POKEMON_INFO_STATUS] = {
         .bg = 0,
         .tilemapLeft = 0,
-        .tilemapTop = 18,
+        .tilemapTop = 14,
         .width = 6,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 199,
+        .baseBlock = 201,
     },
     [PSS_LABEL_WINDOW_POKEMON_INFO_EXP] = {
         .bg = 0,
@@ -460,7 +460,7 @@ static const struct WindowTemplate sPageInfoTemplate[] =
         .width = 8,
         .height = 4,
         .paletteNum = 0,
-        .baseBlock = 211,
+        .baseBlock = 213,
     },
     [PSS_DATA_WINDOW_INFO_ID] = {
         .bg = 0,
@@ -469,7 +469,7 @@ static const struct WindowTemplate sPageInfoTemplate[] =
         .width = 10,
         .height = 4,
         .paletteNum = 0,
-        .baseBlock = 243,
+        .baseBlock = 245,
     },
     [PSS_DATA_WINDOW_INFO_HELD_ITEM] = {
         .bg = 0,
@@ -478,7 +478,7 @@ static const struct WindowTemplate sPageInfoTemplate[] =
         .width = 14,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 283,
+        .baseBlock = 285,
     },
     [PSS_DATA_WINDOW_INFO_EXP] = {
         .bg = 0,
@@ -487,7 +487,7 @@ static const struct WindowTemplate sPageInfoTemplate[] =
         .width = 8,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 311,
+        .baseBlock = 313,
     },
 };
 static const struct WindowTemplate sPageGreenTemplate[] =
@@ -499,7 +499,7 @@ static const struct WindowTemplate sPageGreenTemplate[] =
         .width = 26,
         .height = 6,
         .paletteNum = 0,
-        .baseBlock = 569,
+        .baseBlock = 571,
     },
     [PSS_DATA_WINDOW_GREEN_MEMO] = {
         .bg = 0,
@@ -508,7 +508,7 @@ static const struct WindowTemplate sPageGreenTemplate[] =
         .width = 18,
         .height = 6,
         .paletteNum = 0,
-        .baseBlock = 725,
+        .baseBlock = 727,
     },
 };
 static const struct WindowTemplate sPageSkillsTemplate[] =
@@ -577,7 +577,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
         .width = 16,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 299,
+        .baseBlock = 301,
     },
     [PSS_LABEL_WINDOW_MOVES_APPEAL_JAM] = {
         .bg = 0,
@@ -595,7 +595,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
         .width = 12,
         .height = 8,
         .paletteNum = 0,
-        .baseBlock = 331,
+        .baseBlock = 333,
     },
     [PSS_DATA_WINDOW_MOVE_PP] = {
         .bg = 0,
@@ -604,7 +604,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
         .width = 8,
         .height = 8,
         .paletteNum = 0,
-        .baseBlock = 427,
+        .baseBlock = 429,
     },
     [PSS_DATA_WINDOW_MOVE_DESCRIPTION] = {
         .bg = 0,
@@ -613,7 +613,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
         .width = 20,
         .height = 4,
         .paletteNum = 0,
-        .baseBlock = 491,
+        .baseBlock = 493,
     },
 };
 static const struct WindowTemplate sPageRibbonsTemplate[] = 
@@ -625,7 +625,7 @@ static const struct WindowTemplate sPageRibbonsTemplate[] =
         .width = 10,
         .height = 2,
         .paletteNum = 0,
-        .baseBlock = 299,
+        .baseBlock = 301,
     },
 };
 static const u8 sTextColors[][3] =
@@ -633,7 +633,7 @@ static const u8 sTextColors[][3] =
     {0, 1, 10},
     {0, 1, 10},
     {0, 5, 10},
-    {0, 7, 10},
+    {0, 1, 10},
     {0, 9, 10},
     {0, 11, 10},
     {0, 13, 10},
@@ -642,7 +642,7 @@ static const u8 sTextColors[][3] =
     {0, 1, 10},
     {0, 1, 10},
     {0, 5, 10},
-    {0, 7, 10}
+    {0, 1, 10}
 };
 
 static const u8 sButtons_Gfx[][4 * TILE_SIZE_4BPP] = {
@@ -2871,10 +2871,10 @@ static void PrintGenderSymbol(struct Pokemon *mon, u16 species)
         switch (GetMonGender(mon))
         {
         case MON_MALE:
-            PrintTextOnWindow(PSS_LABEL_WINDOW_PORTRAIT_SPECIES, gText_MaleSymbol, 57, 17, 0, 3);
+            PrintTextOnWindow(PSS_LABEL_WINDOW_PORTRAIT_NICKNAME, gText_MaleSymbol, 80, 0, 0, 3);
             break;
         case MON_FEMALE:
-            PrintTextOnWindow(PSS_LABEL_WINDOW_PORTRAIT_SPECIES, gText_FemaleSymbol, 57, 17, 0, 4);
+            PrintTextOnWindow(PSS_LABEL_WINDOW_PORTRAIT_NICKNAME, gText_FemaleSymbol, 80, 0, 0, 4);
             break;
         }
     }
@@ -3870,7 +3870,7 @@ void SetTypeSpritePosAndPal(u8 typeId, u8 x, u8 y, u8 spriteArrayId)
     SetSpriteInvisibility(spriteArrayId, FALSE);
 }
 
-static void SetMonTypeIcons(void)
+static void SetMonTypeIcons(void) //This is the function you would gut and repalce with a text printer if you wanted to display status ailments as plain text.
 {
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
     if (summary->isEgg)
@@ -3911,7 +3911,7 @@ static void SetMoveTypeIcons(void)
             type = gMovesInfo[summary->moves[i]].type;
             if (P_SHOW_DYNAMIC_TYPES)
                 type = CheckDynamicMoveType(mon, summary->moves[i], 0);
-            SetTypeSpritePosAndPal(type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+            SetTypeSpritePosAndPal(type, 85, 72 + (i * 16), i + SPRITE_ARR_ID_TYPE);
         }
         else
         {
@@ -3927,7 +3927,7 @@ static void SetContestMoveTypeIcons(void)
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (summary->moves[i] != MOVE_NONE)
-            SetTypeSpritePosAndPal(NUMBER_OF_MON_TYPES + gMovesInfo[summary->moves[i]].contestCategory, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+            SetTypeSpritePosAndPal(NUMBER_OF_MON_TYPES + gMovesInfo[summary->moves[i]].contestCategory, 85, 72 + (i * 16), i + SPRITE_ARR_ID_TYPE);
         else
             SetSpriteInvisibility(i + SPRITE_ARR_ID_TYPE, TRUE);
     }
@@ -4035,7 +4035,7 @@ static void PlayMonCry(void)
 static u8 CreateMonSprite(struct Pokemon *unused)
 {
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
-    u8 spriteId = CreateSprite(&gMultiuseSpriteTemplate, 40, 40, 5);
+    u8 spriteId = CreateSprite(&gMultiuseSpriteTemplate, 32, 32, 5);
 
     FreeSpriteOamMatrix(&gSprites[spriteId]);
     gSprites[spriteId].data[0] = summary->species2;
@@ -4142,13 +4142,13 @@ static void CreateSetStatusSprite(void)
     u8 statusAnim;
 
     if (*spriteId == SPRITE_NONE)
-        *spriteId = CreateSprite(&sSpriteTemplate_StatusCondition, 64, 152, 0);
+        *spriteId = CreateSprite(&sSpriteTemplate_StatusCondition, 64, 128, 0);
 
     statusAnim = GetMonAilment(&sMonSummaryScreen->currentMon);
     if (statusAnim != 0)
     {
         StartSpriteAnim(&gSprites[*spriteId], statusAnim - 1);
-        SetSpriteInvisibility(SPRITE_ARR_ID_STATUS, FALSE);
+        SetSpriteInvisibility(SPRITE_ARR_ID_STATUS, TRUE); //Both set to TRUE so that "STATUS" is always shown.
     }
     else
     {
