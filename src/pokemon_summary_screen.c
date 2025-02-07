@@ -633,16 +633,16 @@ static const u8 sTextColors[][3] =
     {0, 1, 10},
     {0, 1, 10},
     {0, 5, 10},
-    {0, 1, 10},
-    {0, 9, 10},
+    {0, 9, 10}, //Male gender symbol.
+    {0, 7, 10}, //Female gender symbol.
     {0, 11, 10},
-    {0, 13, 10},
+    {0, 1, 10}, //OT name.
     {0, 7, 10},
     {0, 15, 10},
     {0, 1, 10},
     {0, 1, 10},
     {0, 5, 10},
-    {0, 1, 10}
+    {0, 1, 10} //Move PP text.
 };
 
 static const u8 sButtons_Gfx[][4 * TILE_SIZE_4BPP] = {
