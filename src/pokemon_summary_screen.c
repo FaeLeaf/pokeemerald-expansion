@@ -96,7 +96,7 @@
 // Dynamic fields for the ribbons page.
 #define PSS_DATA_WINDOW_RIBBONS_RIBBON_COUNT 0
 
-#define MOVE_SELECTOR_SPRITES_COUNT 10
+#define MOVE_SELECTOR_SPRITES_COUNT 15
 #define TYPE_ICON_SPRITE_COUNT (MAX_MON_MOVES + 1)
 // for the spriteIds field in PokemonSummaryScreenData
 enum
@@ -433,7 +433,7 @@ static const struct WindowTemplate sSummaryTemplate[] =
     },
     [PSS_LABEL_WINDOW_POKEMON_INFO_STATUS] = {
         .bg = 0,
-        .tilemapLeft = 0,
+        .tilemapLeft = 1,
         .tilemapTop = 14,
         .width = 6,
         .height = 2,
@@ -599,7 +599,7 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
     },
     [PSS_DATA_WINDOW_MOVE_PP] = {
         .bg = 0,
-        .tilemapLeft = 24,
+        .tilemapLeft = 23,
         .tilemapTop = 9,
         .width = 8,
         .height = 8,
@@ -3171,6 +3171,7 @@ static void BufferMonTrainerMemo(void)
 
 static void PrintMonTrainerMemo(void)
 {
+    PrintTextOnWindow(AddWindowFromTemplateList(sPageGreenTemplate, PSS_DATA_WINDOW_GREEN_MEMO), gText_MET,  0, 0, 0, 1);
     PrintTextOnWindow(AddWindowFromTemplateList(sPageGreenTemplate, PSS_DATA_WINDOW_GREEN_MEMO), gStringVar4, 0, 0, 0, 0);
 }
 
@@ -3591,14 +3592,14 @@ static void PrintMoveNameAndPP(u8 moveIndex)
         DynamicPlaceholderTextUtil_ExpandPlaceholders(gStringVar4, sMovesPPLayout);
         text = gStringVar4;
         ppState = GetCurrentPpToMaxPpState(summary->pp[moveIndex], pp) + 9;
-        x = GetStringRightAlignXOffset(FONT_NORMAL, text, 44);
+        x = GetStringRightAlignXOffset(FONT_NORMAL, text, 40);
     }
     else
     {
         PrintTextOnWindow(moveNameWindowId, gText_OneDash, 0, moveIndex * 16 + 1, 0, 1);
         text = gText_TwoDashes;
         ppState = 12;
-        x = GetStringCenterAlignXOffset(FONT_NORMAL, text, 44);
+        x = GetStringCenterAlignXOffset(FONT_NORMAL, text, 40);
     }
 
     PrintTextOnWindow(ppValueWindowId, text, x, moveIndex * 16 + 1, 0, ppState);
@@ -3911,7 +3912,7 @@ static void SetMoveTypeIcons(void)
             type = gMovesInfo[summary->moves[i]].type;
             if (P_SHOW_DYNAMIC_TYPES)
                 type = CheckDynamicMoveType(mon, summary->moves[i], 0);
-            SetTypeSpritePosAndPal(type, 85, 72 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+            SetTypeSpritePosAndPal(type, 96, 72 + (i * 16), i + SPRITE_ARR_ID_TYPE); // This is where you set the positions of the move type icon images, they use screen offset rather than window offset.
         }
         else
         {
@@ -4169,10 +4170,10 @@ static void CreateMoveSelectorSprites(u8 idArrayStart)
 
         for (i = 0; i < MOVE_SELECTOR_SPRITES_COUNT; i++)
         {
-            spriteIds[i] = CreateSprite(&sMoveSelectorSpriteTemplate, i * 16 + 89, 40, subpriority);
+            spriteIds[i] = CreateSprite(&sMoveSelectorSpriteTemplate, i * 16 + 8, 80, subpriority); // This is basically the position of the flashing highlight box.
             if (i == 0)
                 StartSpriteAnim(&gSprites[spriteIds[i]], 4); // left
-            else if (i == 9)
+            else if (i == 14)
                 StartSpriteAnim(&gSprites[spriteIds[i]], 5); // right, actually the same as left, but flipped
             else
                 StartSpriteAnim(&gSprites[spriteIds[i]], 6); // middle
@@ -4188,7 +4189,7 @@ static void SpriteCB_MoveSelector(struct Sprite *sprite)
 {
     if (sprite->animNum > 3 && sprite->animNum < 7)
     {
-        sprite->data[1] = (sprite->data[1] + 1) & 0x1F;
+        sprite->data[1] = (sprite->data[1] + 1) & 31;
         if (sprite->data[1] > 24)
             sprite->invisible = TRUE;
         else
