@@ -608,10 +608,10 @@ static const struct WindowTemplate sPageMovesTemplate[] = // This is used for bo
     },
     [PSS_DATA_WINDOW_MOVE_DESCRIPTION] = {
         .bg = 0,
-        .tilemapLeft = 10,
-        .tilemapTop = 20,
-        .width = 20,
-        .height = 4,
+        .tilemapLeft = 16,
+        .tilemapTop = 9,
+        .width = 13,
+        .height = 10,
         .paletteNum = 0,
         .baseBlock = 493,
     },
@@ -2629,26 +2629,28 @@ static void Task_ShowStatusWindow(u8 taskId)
 // Toggles the "Cancel" window that appears when selecting a move
 static void TilemapFiveMovesDisplay(u16 *dst, u16 palette, bool8 remove)
 {
-    u16 i, id;
+    u16 i, j, id;
 
-    palette *= 0x1000;
-    id = 0x56A;
+    palette = 0;
+    id = 0x56A - 2 * 32 + 6;
     if (!remove)
     {
-        for (i = 0; i < 20; i++)
+        for (i = 0; i < 11; i++) // Height
         {
-            dst[id + i] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i] + palette;
-            dst[id + i + 0x20] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i] + palette;
-            dst[id + i + 0x40] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i + 20] + palette;
+            for (j = 0; j < 14; j++) // Width (below must match)
+            {
+                dst[id + i * 32 + j] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i * 14 + j] + palette;
+            }
         }
     }
     else // Remove
     {
-        for (i = 0; i < 20; i++)
+        for (i = 0; i < 11; i++) // Height
         {
-            dst[id + i] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i + 20] + palette;
-            dst[id + i + 0x20] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i + 40] + palette;
-            dst[id + i + 0x40] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i + 40] + palette;
+            for (j = 0; j < 14; j++) // Width (below must match)
+            {
+                dst[id + i * 32 + j] = gSummaryScreen_MoveEffect_Cancel_Tilemap[i * 14 + j - 32] + palette;
+            }
         }
     }
 }
