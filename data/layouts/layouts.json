@@ -34,9 +34,9 @@
     {
       "id": "LAYOUT_RUSTBORO_CITY",
       "name": "RustboroCity_Layout",
-      "width": 40,
-      "height": 60,
-      "primary_tileset": "gTileset_General",
+      "width": 36,
+      "height": 30,
+      "primary_tileset": "gTileset_Overworld",
       "secondary_tileset": "gTileset_Rustboro",
       "border_filepath": "data/layouts/RustboroCity/border.bin",
       "blockdata_filepath": "data/layouts/RustboroCity/map.bin"
@@ -184,8 +184,8 @@
     {
       "id": "LAYOUT_ROUTE103",
       "name": "Route103_Layout",
-      "width": 48,
-      "height": 40,
+      "width": 49,
+      "height": 42,
       "primary_tileset": "gTileset_Overworld",
       "secondary_tileset": "gTileset_Cherry",
       "border_filepath": "data/layouts/Route103/border.bin",
@@ -194,9 +194,9 @@
     {
       "id": "LAYOUT_ROUTE104",
       "name": "Route104_Layout",
-      "width": 40,
-      "height": 80,
-      "primary_tileset": "gTileset_General",
+      "width": 32,
+      "height": 40,
+      "primary_tileset": "gTileset_Overworld",
       "secondary_tileset": "gTileset_Rustboro",
       "border_filepath": "data/layouts/Route104/border.bin",
       "blockdata_filepath": "data/layouts/Route104/map.bin"
@@ -304,10 +304,10 @@
     {
       "id": "LAYOUT_ROUTE115",
       "name": "Route115_Layout",
-      "width": 40,
-      "height": 80,
-      "primary_tileset": "gTileset_General",
-      "secondary_tileset": "gTileset_Fallarbor",
+      "width": 33,
+      "height": 48,
+      "primary_tileset": "gTileset_Overworld",
+      "secondary_tileset": "gTileset_Cherry",
       "border_filepath": "data/layouts/Route115/border.bin",
       "blockdata_filepath": "data/layouts/Route115/map.bin"
     },
@@ -576,7 +576,7 @@
       "name": "LittlerootTown_ProfessorBirchsLab_Layout",
       "width": 13,
       "height": 13,
-      "primary_tileset": "gTileset_Building",
+      "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Lab",
       "border_filepath": "data/layouts/LittlerootTown_ProfessorBirchsLab/border.bin",
       "blockdata_filepath": "data/layouts/LittlerootTown_ProfessorBirchsLab/map.bin"
@@ -4135,9 +4135,9 @@
       "id": "LAYOUT_TRAINER_HILL_ENTRANCE",
       "name": "TrainerHill_Entrance_Layout",
       "width": 19,
-      "height": 17,
-      "primary_tileset": "gTileset_Building",
-      "secondary_tileset": "gTileset_TrainerHill",
+      "height": 25,
+      "primary_tileset": "gTileset_Overworld",
+      "secondary_tileset": "gTileset_Cherry",
       "border_filepath": "data/layouts/TrainerHill_Entrance/border.bin",
       "blockdata_filepath": "data/layouts/TrainerHill_Entrance/map.bin"
     },

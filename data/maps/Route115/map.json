@@ -15,13 +15,13 @@
   "connections": [
     {
       "map": "MAP_RUSTBORO_CITY",
-      "offset": 0,
+      "offset": 14,
       "direction": "down"
     },
     {
-      "map": "MAP_ROUTE114",
-      "offset": -40,
-      "direction": "right"
+      "map": "MAP_ROUTE104",
+      "offset": 8,
+      "direction": "up"
     }
   ],
   "object_events": [
@@ -348,7 +348,9 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+
+  ],
   "bg_events": [
     {
       "type": "secret_base",

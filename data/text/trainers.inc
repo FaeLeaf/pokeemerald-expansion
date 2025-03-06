@@ -58,6 +58,11 @@ Route102_Text_RickPostBattle:
 	.string "you have to challenge! It's a rule!$"
 
 Route102_Text_TianaIntro:
+	.string "This is a test\n"
+	.string "to see if it works.\p"
+	.string "Yeah!$"
+
+Route102_Text_TestIntro:
 	.string "I'm going to keep winning and aim\n"
 	.string "to be the best TRAINER.\p"
 	.string "Help me further my career!$"
@@ -65,9 +70,16 @@ Route102_Text_TianaIntro:
 Route102_Text_TianaDefeated:
 	.string "I ended up furthering your career…$"
 
+Route102_Text_TestDefeated:
+	.string "I hope this worked!$"
+
 Route102_Text_TianaPostBattle:
 	.string "To keep winning my way up, I see that\n"
 	.string "I have to catch more POKéMON.$"
+
+Route102_Text_TestPostBattle:
+	.string "If this test didn't work,\n"
+	.string "I'll have to change it.$"
 
 Route103_Text_DaisyIntro:
 	.string "Did you feel the tug of our\n"

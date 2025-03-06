@@ -1,4 +1,5 @@
 .set LOCALID_TWIN, 1
+.set LOCALID_FATMAN, 2
 .set LOCALID_MOM, 4
 .set LOCALID_RIVAL, 7
 .set LOCALID_BIRCH, 8
@@ -248,10 +249,12 @@ LittlerootTown_EventScript_SetRivalBirchPosForDexUpgradeFemale::
 
 LittlerootTown_EventScript_FatMan::
 	msgbox LittlerootTown_Text_CanUsePCToStoreItems, MSGBOX_NPC
+	goto_if_set FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_YouSavedBirch
 	end
 
 LittlerootTown_EventScript_Boy::
 	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
+	setflag FLAG_RESCUED_BIRCH
 	end
 
 LittlerootTown_EventScript_Twin::
@@ -323,6 +326,24 @@ LittlerootTown_Movement_TwinApproachPlayerLeft:
 
 LittlerootTown_Movement_TwinPushPlayerFromRoute:
 	walk_down
+	step_end
+
+LittlerootTown_EventScript_FatManEventWalkLeft::
+	applymovement LOCALID_FATMAN, LittlerootTown_Movement_FatManWalkLeft
+	end
+
+LittlerootTown_EventScript_FatManEventWalkRight::
+	applymovement LOCALID_FATMAN, LittlerootTown_Movement_FatManWalkLeft
+	end
+
+LittlerootTown_Movement_FatManWalkLeft:
+	walk_left
+	walk_left
+	step_end
+
+LittlerootTown_Movement_FatManWalkRight:
+	walk_right
+	walk_right
 	step_end
 
 LittlerootTown_Movement_TwinReturnLeft:

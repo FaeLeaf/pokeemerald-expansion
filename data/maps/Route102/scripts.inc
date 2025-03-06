@@ -64,8 +64,13 @@ Route102_EventScript_Rick::
 	end
 
 Route102_EventScript_Tiana::
-	trainerbattle_single TRAINER_TIANA, Route102_Text_TianaIntro, Route102_Text_TianaDefeated
+	trainerbattle_single TRAINER_TIANA,Route102_Text_TianaIntro, Route102_Text_TianaDefeated
 	msgbox Route102_Text_TianaPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+Route102_EventScript_Test::
+	trainerbattle_single TRAINER_TEST,Route102_Text_TestIntro, Route102_Text_TestDefeated
+	msgbox Route102_Text_TestPostBattle, MSGBOX_AUTOCLOSE
 	end
 
 Route102_EventScript_Allen::
