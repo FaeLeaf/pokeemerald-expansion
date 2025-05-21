@@ -38,10 +38,12 @@
     "gMapGroup_IndoorRoute124"
   ],
   "gMapGroup_Towns": [
-    "OliveTown"
+    "OliveTown",
+    "CedarTown"
   ],
   "gMapGroup_Routes": [
-    "Route1"
+    "Route1",
+    "Route2"
   ],
   "gMapGroup_TownsAndRoutes": [
     "PetalburgCity",

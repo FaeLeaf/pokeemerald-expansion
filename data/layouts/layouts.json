@@ -4430,6 +4430,26 @@
       "secondary_tileset": "gTileset_Unused1",
       "border_filepath": "data/layouts/OliveTown/border.bin",
       "blockdata_filepath": "data/layouts/OliveTown/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE2",
+      "name": "Route2_Layout",
+      "width": 55,
+      "height": 25,
+      "primary_tileset": "gTileset_Overworld",
+      "secondary_tileset": "gTileset_Unused1",
+      "border_filepath": "data/layouts/Route2/border.bin",
+      "blockdata_filepath": "data/layouts/Route2/map.bin"
+    },
+    {
+      "id": "LAYOUT_CEDAR_TOWN",
+      "name": "CedarTown_Layout",
+      "width": 30,
+      "height": 25,
+      "primary_tileset": "gTileset_Overworld",
+      "secondary_tileset": "gTileset_Unused1",
+      "border_filepath": "data/layouts/CedarTown/border.bin",
+      "blockdata_filepath": "data/layouts/CedarTown/map.bin"
     }
   ]
 }
