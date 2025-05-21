@@ -398,43 +398,6 @@ static void RemoveTrainerHillRecordsWindow(u8 windowId)
     RemoveWindow(windowId);
 }
 
-static void ClearVramOamPlttRegs(void)
-{
-    DmaClearLarge16(3, (void *)(VRAM), VRAM_SIZE, 0x1000);
-    DmaClear32(3, OAM, OAM_SIZE);
-    DmaClear16(3, PLTT, PLTT_SIZE);
-
-    SetGpuReg(REG_OFFSET_DISPCNT, 0);
-    SetGpuReg(REG_OFFSET_BG0CNT, 0);
-    SetGpuReg(REG_OFFSET_BG0HOFS, 0);
-    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
-    SetGpuReg(REG_OFFSET_BG1CNT, 0);
-    SetGpuReg(REG_OFFSET_BG1HOFS, 0);
-    SetGpuReg(REG_OFFSET_BG1VOFS, 0);
-    SetGpuReg(REG_OFFSET_BG2CNT, 0);
-    SetGpuReg(REG_OFFSET_BG2HOFS, 0);
-    SetGpuReg(REG_OFFSET_BG2VOFS, 0);
-    SetGpuReg(REG_OFFSET_BG3CNT, 0);
-    SetGpuReg(REG_OFFSET_BG3HOFS, 0);
-    SetGpuReg(REG_OFFSET_BG3VOFS, 0);
-    SetGpuReg(REG_OFFSET_WIN0H, 0);
-    SetGpuReg(REG_OFFSET_WIN0V, 0);
-    SetGpuReg(REG_OFFSET_WININ, 0);
-    SetGpuReg(REG_OFFSET_WINOUT, 0);
-    SetGpuReg(REG_OFFSET_BLDCNT, 0);
-    SetGpuReg(REG_OFFSET_BLDALPHA, 0);
-    SetGpuReg(REG_OFFSET_BLDY, 0);
-}
-
-static void ClearTasksAndGraphicalStructs(void)
-{
-    ScanlineEffect_Stop();
-    ResetTasks();
-    ResetSpriteData();
-    ResetPaletteFade();
-    FreeAllSpritePalettes();
-}
-
 static void ResetBgCoordinates(void)
 {
     ChangeBgX(0, 0, BG_COORD_SET);
