@@ -207,3 +207,13 @@ const u16 gMetatileAttributes_MysteryEventsHouse[] = INCBIN_U16("data/tilesets/s
 
 const u16 gMetatiles_UnionRoom[] = INCBIN_U16("data/tilesets/secondary/union_room/metatiles.bin");
 const u16 gMetatileAttributes_UnionRoom[] = INCBIN_U16("data/tilesets/secondary/union_room/metatile_attributes.bin");
+
+// Custom
+const u16 gMetatiles_Overworld[] = INCBIN_U16("data/tilesets/primary/overworld/metatiles.bin");
+const u16 gMetatileAttributes_Overworld[] = INCBIN_U16("data/tilesets/primary/overworld/metatile_attributes.bin");
+
+const u16 gMetatiles_Cherry[] = INCBIN_U16("data/tilesets/secondary/cherry/metatiles.bin");
+const u16 gMetatileAttributes_Cherry[] = INCBIN_U16("data/tilesets/secondary/cherry/metatile_attributes.bin");
+
+const u16 gMetatiles_Sprout[] = INCBIN_U16("data/tilesets/secondary/sprout/metatiles.bin");
+const u16 gMetatileAttributes_Sprout[] = INCBIN_U16("data/tilesets/secondary/sprout/metatile_attributes.bin");
