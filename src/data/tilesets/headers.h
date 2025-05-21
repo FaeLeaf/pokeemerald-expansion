@@ -829,7 +829,7 @@ const struct Tileset gTileset_UnionRoom =
 // Custom
 const struct Tileset gTileset_Overworld =
 {
-    .isCompressed = FALSE,
+    .isCompressed = TRUE,
     .isSecondary = FALSE,
     .tiles = gTilesetTiles_Overworld,
     .palettes = gTilesetPalettes_Overworld,
