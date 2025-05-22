@@ -316,6 +316,8 @@ static void DestroyPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNumberOntoPokedexEntryBox(struct EntryBoxData *box);
 static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box);
+static void InitPokedexEntryBoxData(void);
+static struct EntryBoxData * GetFirstEmptyPokedexEntryBox(void);
 static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index);
 
 // UI functions
@@ -400,6 +402,7 @@ void CB2_OpenPokedexCustom(void)
 
 static void Task_OpenPokedex(u8 taskId)
 {
+    InitPokedexEntryBoxData();
     LoadPokedexMainPageGfx();
     if (!gPaletteFade.active)
         gTasks[taskId].func = Task_PokedexWaitForKeypress;
@@ -459,10 +462,10 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
     {
         box = &sPokedexViewData.entryBoxes[i];
         // Change indices.
-        if (box->index < BOX_HIDDEN)
-            box->index += 1;
-        else
+        if (box->index == BOX_HIDDEN)
             box->index = BOX_0;
+        else if (box->index != 0xFF)
+            box->index += 1;
 
         // Update positions.
         gSprites[box->leftSpriteId].x = sEntryBoxPositions[box->index][0];
@@ -474,6 +477,28 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         if (box->index == BOX_CENTER)
             UpdateSelectedMonFrontSprite(box->species);
     }
+
+    box = GetPokedexEntryBoxByIndex(BOX_0);
+    if (box == NULL)
+    {
+        box = GetFirstEmptyPokedexEntryBox();
+        box->index = BOX_0;
+        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_0 + 1)->species - 1);
+    }
+    else if (box->species >= SPECIES_BULBASAUR + MAX_ENTRY_BOXES)
+    {
+        box->species -= MAX_ENTRY_BOXES;
+        DestroyPokedexEntryBox(box);
+        CreatePokedexEntryBox(box, box->species);
+    }
+    else
+    {
+        DestroyPokedexEntryBox(box);
+        box->species = SPECIES_NONE;
+        box->index = 0xFF;
+        box->leftSpriteId = 0xFF;
+    }
+
     gTasks[taskId].func = Task_PokedexWaitForKeypress;
 }
 
@@ -485,10 +510,10 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
     {
         box = &sPokedexViewData.entryBoxes[i];
         // Change indices.
-        if (box->index > BOX_0)
-            box->index -= 1;
-        else
+        if (box->index == BOX_0)
             box->index = BOX_HIDDEN;
+        else if (box->index != 0xFF)
+            box->index -= 1;
 
         // Update positions.
         gSprites[box->leftSpriteId].x = sEntryBoxPositions[box->index][0];
@@ -500,16 +525,38 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         if (box->index == BOX_CENTER)
             UpdateSelectedMonFrontSprite(box->species);
     }
+
+    box = GetPokedexEntryBoxByIndex(BOX_HIDDEN);
+    if (box == NULL)
+    {
+        box = GetFirstEmptyPokedexEntryBox();
+        box->index = BOX_HIDDEN;
+        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_HIDDEN-1)->species + 1);
+    }
+    else if (box->species <= SPECIES_NIDORAN_F - MAX_ENTRY_BOXES)
+    {
+        box->species += MAX_ENTRY_BOXES;
+        DestroyPokedexEntryBox(box);
+        CreatePokedexEntryBox(box, box->species);
+    }
+    else
+    {
+        DestroyPokedexEntryBox(box);
+        box->species = SPECIES_NONE;
+        box->index = 0xFF;
+        box->leftSpriteId = 0xFF;
+    }
+
     gTasks[taskId].func = Task_PokedexWaitForKeypress;
 }
 
 static void Task_PokedexWaitForKeypress(u8 taskId)
 {
-    if (gMain.heldKeys & DPAD_UP)
+    if (gMain.heldKeys & DPAD_UP && sPokedexViewData.selectedSpecies != SPECIES_BULBASAUR)
     {
         gTasks[taskId].func = Task_PokedexScrollUp;
     }
-    if (gMain.heldKeys & DPAD_DOWN)
+    if (gMain.heldKeys & DPAD_DOWN && sPokedexViewData.selectedSpecies != SPECIES_NIDORAN_F)
     {
         gTasks[taskId].func = Task_PokedexScrollDown;        
     }
@@ -545,21 +592,17 @@ static void LoadPokedexMainPageGfx(void)
     LoadSpritePalette(&sSpritePalette_PokedexEntry);
     LoadSpriteSheet(&sSpriteSheet_Number);
 
-    sPokedexViewData.entryBoxes[0].index = sPokedexViewData.entryBoxes[0].arrIndex = 0;
-    sPokedexViewData.entryBoxes[1].index = sPokedexViewData.entryBoxes[1].arrIndex = 1;
-    sPokedexViewData.entryBoxes[2].index = sPokedexViewData.entryBoxes[2].arrIndex = 2;
-    sPokedexViewData.entryBoxes[3].index = sPokedexViewData.entryBoxes[3].arrIndex = 3;
-    sPokedexViewData.entryBoxes[4].index = sPokedexViewData.entryBoxes[4].arrIndex = 4;
-    sPokedexViewData.entryBoxes[5].index = sPokedexViewData.entryBoxes[5].arrIndex = 5;
+    sPokedexViewData.entryBoxes[2].index = 2;
+    sPokedexViewData.entryBoxes[3].index = 3;
+    sPokedexViewData.entryBoxes[4].index = 4;
+    sPokedexViewData.entryBoxes[5].index = 5;
 
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], SPECIES_BULBASAUR);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[1], SPECIES_BULBASAUR + 1);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], SPECIES_BULBASAUR + 2);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], SPECIES_BULBASAUR + 3);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], SPECIES_BULBASAUR + 4);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], SPECIES_BULBASAUR + 5);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], SPECIES_BULBASAUR);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], SPECIES_BULBASAUR + 1);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], SPECIES_BULBASAUR + 2);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], SPECIES_BULBASAUR + 3);
 
-    CreateSelectedMonFrontSprite(SPECIES_BULBASAUR + 2);
+    CreateSelectedMonFrontSprite(GetPokedexEntryBoxByIndex(BOX_CENTER)->species);
     CreatePokedexWindows();
     PrintSeenOwnCount();
 }
@@ -592,6 +635,7 @@ static void PrintSeenOwnCount(void)
 
 static void CreateSelectedMonFrontSprite(u32 species)
 {
+    sPokedexViewData.selectedSpecies = species;
     sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
 }
 
@@ -760,6 +804,38 @@ static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
     box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
     gSprites[box->iconSpriteId].oam.priority = 3;
     gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
+}
+
+static void InitPokedexEntryBoxData(void)
+{
+    u32 i;
+    struct EntryBoxData *box;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
+    {
+        box = &sPokedexViewData.entryBoxes[i];
+        box->arrIndex = i;
+        box->index = 0xFF;
+        box->species = SPECIES_NONE;
+        box->leftSpriteId = SPRITE_NONE;
+        box->middleSpriteId = SPRITE_NONE;
+        box->rightSpriteId = SPRITE_NONE;
+        box->iconSpriteId = SPRITE_NONE;
+        box->numberSpriteIds[0] = SPRITE_NONE;
+        box->numberSpriteIds[1] = SPRITE_NONE;
+        box->numberSpriteIds[2] = SPRITE_NONE;
+    }
+}
+
+static struct EntryBoxData * GetFirstEmptyPokedexEntryBox(void)
+{
+    u32 i;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
+    {
+        DebugPrintf("box %d: %d", i, sPokedexViewData.entryBoxes[i].index);
+        if (sPokedexViewData.entryBoxes[i].index == 0xFF)
+            return &sPokedexViewData.entryBoxes[i];
+    }
+    return NULL;
 }
 
 static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index)
