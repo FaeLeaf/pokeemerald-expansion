@@ -49,11 +49,13 @@ struct EntryBoxData
     u8 numberSpriteIds[3];
     u8 index;
 };
+
 struct PokedexView
 {
     u16 selectedSpecies;
     u8 selectedMonSpriteId;
-    struct EntryBoxData entryBoxes[MAX_ENTRY_BOXES];
+    struct EntryBoxData entryBoxes[MAX_ENTRY_BOXES]; // circular array
+    u8 entryBoxTop;
 };
 
 EWRAM_DATA static u32 *sPokedexTilemapPtr = NULL;
@@ -213,10 +215,12 @@ static void LoadPokedexMainPageGfx(void);
 static void PrintSeenOwnCount(void);
 static void DrawWindows(void);
 static void CreateSelectedMonFrontSprite(u32 species);
-static void CreatePokedexEntryBoxSprite(void);
-static void PrintNameOntoPokedexEntryBox(u32 leftSpriteId, u32 species);
-static void PrintNumberOntoPokedexEntryBox(u32 leftSpriteId, u32 species);
-static void CreateMonIconOnPokedexEntryBox(u32 leftSpriteId, u32 species);
+static void UpdateSelectedMonFrontSprite(u32 species);
+static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species);
+static void DestroyPokedexEntryBox(struct EntryBoxData *box);
+static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box);
+static void PrintNumberOntoPokedexEntryBox(struct EntryBoxData *box);
+static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box);
 
 // UI functions
 static void MainCB2_Pokedex(void)
@@ -307,6 +311,12 @@ static void Task_OpenPokedex(u8 taskId)
 
 static void Task_PokedexWaitForKeypress(u8 taskId)
 {
+    if (gMain.newKeys & DPAD_UP)
+    {
+        DestroyPokedexEntryBox(&sPokedexViewData.entryBoxes[0]);
+        CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], (++sPokedexViewData.selectedSpecies));
+        UpdateSelectedMonFrontSprite(sPokedexViewData.selectedSpecies);
+    }
     if (gMain.newKeys & B_BUTTON)
     {
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
@@ -335,7 +345,8 @@ static void Task_ClosePokedex(u8 taskId)
 
 static void LoadPokedexMainPageGfx(void)
 {
-    CreatePokedexEntryBoxSprite();
+    LoadSpriteSheet(&sSpriteSheet_Number);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], 1);
     CreateSelectedMonFrontSprite(1);
     DrawWindows();
     PrintSeenOwnCount();
@@ -372,10 +383,13 @@ static void CreateSelectedMonFrontSprite(u32 species)
     sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
 }
 
-#define sLeftSpriteId   data[0] // for middle, right, icon, number, and ball sprites
-#define sMiddleSpriteId data[0] // for left sprite
-#define sRightSpriteId  data[1] // for left sprite
+static void UpdateSelectedMonFrontSprite(u32 species)
+{
+    FreeAndDestroyMonPicSprite(sPokedexViewData.selectedMonSpriteId);
+    sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+}
 
+#define sLeftSpriteId   data[0] // for middle, right, icon, number, and ball sprites
 #define sDigitId        data[1] // for numbers
 
 #define VRAM_OFFSET_LEFT_SPRITE (1024 + 32 * 4)     // each increment of 32 pushes text forward one tile
@@ -387,32 +401,43 @@ static void SpriteCB_EntryBox(struct Sprite *sprite)
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
 }
 
-static void CreatePokedexEntryBoxSprite(void)
+static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species)
 {
-    u32 leftId, middleId, rightId;
+    box->species = species;
 
     LoadSpritePalette(&sSpritePalette_PokedexEntry);
     LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntry);
-    leftId = CreateSprite(&sPokedexEntrySpriteTemplate, 110, 75, 0);
+    box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplate, 110, 75, 0);
 
-    middleId = CreateSprite(&sPokedexEntrySpriteTemplate, 174, 75, 0);
-    gSprites[leftId].sMiddleSpriteId = middleId;
-    gSprites[middleId].sLeftSpriteId = leftId;
-    gSprites[middleId].oam.tileNum += 64;
-    gSprites[middleId].callback = SpriteCB_EntryBox;
+    box->middleSpriteId = CreateSprite(&sPokedexEntrySpriteTemplate, 174, 75, 0);
+    gSprites[box->middleSpriteId].sLeftSpriteId = box->leftSpriteId;
+    gSprites[box->middleSpriteId].oam.tileNum += 64;
+    gSprites[box->middleSpriteId].callback = SpriteCB_EntryBox;
 
-    rightId = CreateSprite(&sPokedexEntrySpriteTemplate, 238, 75, 0);
-    gSprites[leftId].sRightSpriteId = rightId;
-    gSprites[rightId].sLeftSpriteId = leftId;
-    gSprites[rightId].oam.tileNum += 128;
-    gSprites[rightId].callback = SpriteCB_EntryBox;
+    box->rightSpriteId = CreateSprite(&sPokedexEntrySpriteTemplate, 238, 75, 0);
+    gSprites[box->rightSpriteId].sLeftSpriteId = box->leftSpriteId;
+    gSprites[box->rightSpriteId].oam.tileNum += 128;
+    gSprites[box->rightSpriteId].callback = SpriteCB_EntryBox;
 
-    PrintNameOntoPokedexEntryBox(leftId, 1);
-    CreateMonIconOnPokedexEntryBox(leftId, 1);
-    PrintNumberOntoPokedexEntryBox(leftId, 1);
+    PrintNameOntoPokedexEntryBox(box);
+    CreateMonIconOnPokedexEntryBox(box);
+    PrintNumberOntoPokedexEntryBox(box);
 }
 
-static void PrintNameOntoPokedexEntryBox(u32 leftSpriteId, u32 species)
+static void DestroyPokedexEntryBox(struct EntryBoxData *box)
+{
+    FreeMonIconPalette(box->species);
+    FreeAndDestroyMonIconSprite(&gSprites[box->iconSpriteId]);
+    DestroySprite(&gSprites[box->numberSpriteIds[0]]);
+    DestroySprite(&gSprites[box->numberSpriteIds[1]]);
+    DestroySprite(&gSprites[box->numberSpriteIds[2]]);
+    FreeSpriteTiles(&gSprites[box->leftSpriteId]);
+    DestroySprite(&gSprites[box->leftSpriteId]);
+    DestroySprite(&gSprites[box->middleSpriteId]);
+    DestroySprite(&gSprites[box->rightSpriteId]);
+}
+
+static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box)
 {
     u8 *windowTileData;
     void *objVram;
@@ -422,12 +447,12 @@ static void PrintNameOntoPokedexEntryBox(u32 leftSpriteId, u32 species)
 
     // Set up text.
     u8 *txtPtr = NULL;
-    const u8 *speciesName = GetSpeciesName(species);
+    const u8 *speciesName = GetSpeciesName(box->species);
     u32 length = StringLength(speciesName);
-    StringCopy(gStringVar3, GetSpeciesName(species));
+    StringCopy(gStringVar3, speciesName);
     if (length > 4)
     {
-        StringCopy(gStringVar4, GetSpeciesName(species));
+        StringCopy(gStringVar4, speciesName);
         txtPtr = &gStringVar4[4];
     }
 
@@ -436,7 +461,7 @@ static void PrintNameOntoPokedexEntryBox(u32 leftSpriteId, u32 species)
     FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
     AddTextPrinterParameterized4(windowId, FONT_NORMAL, 0, 4, 0, 0, color, TEXT_SKIP_DRAW, gStringVar3);
 
-    objVram = (void *)(OBJ_VRAM0) + gSprites[leftSpriteId].oam.tileNum * TILE_SIZE_4BPP;
+    objVram = (void *)(OBJ_VRAM0) + gSprites[box->leftSpriteId].oam.tileNum * TILE_SIZE_4BPP;
     windowTileData = (u8 *)(GetWindowAttribute(windowId, WINDOW_TILE_DATA));
     CpuCopy32(windowTileData + 256, objVram + VRAM_OFFSET_LEFT_SPRITE, 4 * TILE_SIZE_4BPP); // assumes min length of 4
     RemoveWindow(windowId);
@@ -448,7 +473,7 @@ static void PrintNameOntoPokedexEntryBox(u32 leftSpriteId, u32 species)
         FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
         AddTextPrinterParameterized4(windowId, FONT_NORMAL, 0, 4, 0, 0, color, TEXT_SKIP_DRAW, txtPtr);
 
-        objVram = (void *)(OBJ_VRAM0) + gSprites[gSprites[leftSpriteId].sMiddleSpriteId].oam.tileNum * TILE_SIZE_4BPP;
+        objVram = (void *)(OBJ_VRAM0) + gSprites[box->middleSpriteId].oam.tileNum * TILE_SIZE_4BPP;
         windowTileData = (u8 *)(GetWindowAttribute(windowId, WINDOW_TILE_DATA));
         CpuCopy32(windowTileData + 256, objVram + VRAM_OFFSET_RIGHT_SPRITE, (length - 4) * TILE_SIZE_4BPP);
         RemoveWindow(windowId);
@@ -463,10 +488,10 @@ static void SpriteCB_EntryNumber(struct Sprite* sprite)
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
 }
 
-static void PrintNumberOntoPokedexEntryBox(u32 leftSpriteId, u32 species)
+static void PrintNumberOntoPokedexEntryBox(struct EntryBoxData *box)
 {
     u32 leftId, middleId, rightId;
-    u32 num = gSpeciesInfo[species].natDexNum;
+    u32 num = gSpeciesInfo[box->species].natDexNum;
 
     // Store each digit.
     u32 hundreds = 0, tens = 0, ones = 0;
@@ -483,20 +508,19 @@ static void PrintNumberOntoPokedexEntryBox(u32 leftSpriteId, u32 species)
     ones = num;
 
     // Create sprites.
-    LoadSpriteSheet(&sSpriteSheet_Number);
-    leftId = CreateSprite(&sNumberSpriteTemplate, 0, 0, 0);
+    leftId = box->numberSpriteIds[0] = CreateSprite(&sNumberSpriteTemplate, 0, 0, 0);
     gSprites[leftId].oam.tileNum += 1 * hundreds;
-    gSprites[leftId].sLeftSpriteId = leftSpriteId;
+    gSprites[leftId].sLeftSpriteId = box->leftSpriteId;
     gSprites[leftId].sDigitId = 0;
 
-    middleId = CreateSprite(&sNumberSpriteTemplate, 0, 0, 0);
+    middleId = box->numberSpriteIds[1] = CreateSprite(&sNumberSpriteTemplate, 0, 0, 0);
     gSprites[middleId].oam.tileNum += 1 * tens;
-    gSprites[middleId].sLeftSpriteId = leftSpriteId;
+    gSprites[middleId].sLeftSpriteId = box->leftSpriteId;
     gSprites[middleId].sDigitId = 1;
 
-    rightId = CreateSprite(&sNumberSpriteTemplate, 0, 0, 0);
+    rightId = box->numberSpriteIds[2] = CreateSprite(&sNumberSpriteTemplate, 0, 0, 0);
     gSprites[rightId].oam.tileNum += 1 * ones;
-    gSprites[rightId].sLeftSpriteId = leftSpriteId;
+    gSprites[rightId].sLeftSpriteId = box->leftSpriteId;
     gSprites[rightId].sDigitId = 2;
 }
 
@@ -509,15 +533,13 @@ static void SpriteCB_MonIconDex(struct Sprite *sprite)
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
 }
 
-static void CreateMonIconOnPokedexEntryBox(u32 leftSpriteId, u32 species)
+static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
 {
-    u32 spriteId;
-    LoadMonIconPalette(species);
-    spriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(species), SpriteCB_MonIconDex, 0, 0, 0);
-    gSprites[spriteId].oam.priority = 3;
-    gSprites[spriteId].sLeftSpriteId = leftSpriteId;
+    LoadMonIconPalette(box->species);
+    box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
+    gSprites[box->iconSpriteId].oam.priority = 3;
+    gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
 }
 
 #undef sLeftSpriteId
-#undef sMiddleSpriteId
-#undef sRightSpriteId
+#undef sDigitId
