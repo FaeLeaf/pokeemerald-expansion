@@ -35,9 +35,9 @@
 #include "constants/songs.h"
 
 #define TAG_POKEDEX_ENTRY   2000
-#define TAG_NUMBER          2001
+#define TAG_NUMBER          2007
 
-#define MAX_ENTRY_BOXES     7
+#define MAX_ENTRY_BOXES     6
 
 struct EntryBoxData
 {
@@ -139,9 +139,14 @@ static u32 sBlackPal = RGB(0, 0, 0);
 
 static const struct SpritePalette sSpritePalette_PokedexEntry = {sPokedexEntryPalette, TAG_POKEDEX_ENTRY};
 
-static const struct CompressedSpriteSheet sSpriteSheet_PokedexEntry =
+static const struct CompressedSpriteSheet sSpriteSheet_PokedexEntryBoxes[] =
 {
-    sPokedexEntryGfx, 0x2000, TAG_POKEDEX_ENTRY
+    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY},
+    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 1},
+    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 2},
+    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 3},
+    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 4},
+    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 5},
 };
 
 static const struct SpriteSheet sSpriteSheet_Number =
@@ -166,7 +171,7 @@ static const struct OamData sOamData_8x8 =
     .affineParam = 0,
 };
 
-static const struct OamData sOamData_64x64 =
+static const struct OamData sOamData_64x32 =
 {
     .x = 0,
     .y = 0,
@@ -174,24 +179,71 @@ static const struct OamData sOamData_64x64 =
     .objMode = ST_OAM_OBJ_NORMAL,
     .mosaic = FALSE,
     .bpp = ST_OAM_4BPP,
-    .shape = SPRITE_SHAPE(64x64),
+    .shape = SPRITE_SHAPE(64x32),
     .matrixNum = 0,
-    .size = SPRITE_SIZE(64x64),
+    .size = SPRITE_SIZE(64x32),
     .tileNum = 0,
     .priority = 3,
     .paletteNum = 0,
     .affineParam = 0,
 };
 
-static const struct SpriteTemplate sPokedexEntrySpriteTemplate =
+static const struct SpriteTemplate sPokedexEntrySpriteTemplates[] =
 {
-    .tileTag = TAG_POKEDEX_ENTRY,
-    .paletteTag = TAG_POKEDEX_ENTRY,
-    .oam = &sOamData_64x64,
-    .anims = gDummySpriteAnimTable,
-    .images = NULL,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCallbackDummy,
+    {
+        .tileTag = TAG_POKEDEX_ENTRY,
+        .paletteTag = TAG_POKEDEX_ENTRY,
+        .oam = &sOamData_64x32,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_POKEDEX_ENTRY + 1,
+        .paletteTag = TAG_POKEDEX_ENTRY,
+        .oam = &sOamData_64x32,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_POKEDEX_ENTRY + 2,
+        .paletteTag = TAG_POKEDEX_ENTRY,
+        .oam = &sOamData_64x32,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_POKEDEX_ENTRY + 3,
+        .paletteTag = TAG_POKEDEX_ENTRY,
+        .oam = &sOamData_64x32,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_POKEDEX_ENTRY + 4,
+        .paletteTag = TAG_POKEDEX_ENTRY,
+        .oam = &sOamData_64x32,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_POKEDEX_ENTRY + 5,
+        .paletteTag = TAG_POKEDEX_ENTRY,
+        .oam = &sOamData_64x32,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
 };
 
 static void SpriteCB_EntryNumber(struct Sprite*);
@@ -315,6 +367,7 @@ static void Task_PokedexWaitForKeypress(u8 taskId)
     {
         DestroyPokedexEntryBox(&sPokedexViewData.entryBoxes[0]);
         CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], (++sPokedexViewData.selectedSpecies));
+        sPokedexViewData.selectedSpecies = sPokedexViewData.entryBoxes[3].species;
         UpdateSelectedMonFrontSprite(sPokedexViewData.selectedSpecies);
     }
     if (gMain.newKeys & B_BUTTON)
@@ -345,8 +398,23 @@ static void Task_ClosePokedex(u8 taskId)
 
 static void LoadPokedexMainPageGfx(void)
 {
+    LoadSpritePalette(&sSpritePalette_PokedexEntry);
     LoadSpriteSheet(&sSpriteSheet_Number);
+
+    sPokedexViewData.entryBoxes[0].index = 0;
+    sPokedexViewData.entryBoxes[1].index = 1;
+    sPokedexViewData.entryBoxes[2].index = 2;
+    sPokedexViewData.entryBoxes[3].index = 3;
+    sPokedexViewData.entryBoxes[4].index = 4;
+    sPokedexViewData.entryBoxes[5].index = 5;
+
     CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], 1);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[1], 2);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], 3);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], 4);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], 5);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], 6);
+
     CreateSelectedMonFrontSprite(1);
     DrawWindows();
     PrintSeenOwnCount();
@@ -392,8 +460,8 @@ static void UpdateSelectedMonFrontSprite(u32 species)
 #define sLeftSpriteId   data[0] // for middle, right, icon, number, and ball sprites
 #define sDigitId        data[1] // for numbers
 
-#define VRAM_OFFSET_LEFT_SPRITE (1024 + 32 * 4)     // each increment of 32 pushes text forward one tile
-#define VRAM_OFFSET_RIGHT_SPRITE (1024)
+#define VRAM_OFFSET_LEFT_SPRITE (512 + 32 * 4)     // each increment of 32 pushes text forward one tile
+#define VRAM_OFFSET_RIGHT_SPRITE (512)
 
 static void SpriteCB_EntryBox(struct Sprite *sprite)
 {
@@ -405,18 +473,17 @@ static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species)
 {
     box->species = species;
 
-    LoadSpritePalette(&sSpritePalette_PokedexEntry);
-    LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntry);
-    box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplate, 110, 75, 0);
+    LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntryBoxes[box->index]);
+    box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->index], 110 + abs(2-box->index)*8, 11+32*box->index, 16);
 
-    box->middleSpriteId = CreateSprite(&sPokedexEntrySpriteTemplate, 174, 75, 0);
+    box->middleSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->index], 174 + abs(2-box->index)*8, 11+32*box->index, 16);
     gSprites[box->middleSpriteId].sLeftSpriteId = box->leftSpriteId;
-    gSprites[box->middleSpriteId].oam.tileNum += 64;
+    gSprites[box->middleSpriteId].oam.tileNum += 32;
     gSprites[box->middleSpriteId].callback = SpriteCB_EntryBox;
 
-    box->rightSpriteId = CreateSprite(&sPokedexEntrySpriteTemplate, 238, 75, 0);
+    box->rightSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->index], 238 + abs(2-box->index)*8, 11 + 32*box->index, 16);
     gSprites[box->rightSpriteId].sLeftSpriteId = box->leftSpriteId;
-    gSprites[box->rightSpriteId].oam.tileNum += 128;
+    gSprites[box->rightSpriteId].oam.tileNum += 64;
     gSprites[box->rightSpriteId].callback = SpriteCB_EntryBox;
 
     PrintNameOntoPokedexEntryBox(box);
