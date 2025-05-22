@@ -33,12 +33,25 @@
 #include "constants/pokedex.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/species.h"
 
-#define TAG_POKEDEX_ENTRY   2000
+// constants
+#define TAG_POKEDEX_ENTRY   2000 // 2000-2006 used for each box
 #define TAG_NUMBER          2007
-
 #define MAX_ENTRY_BOXES     6
 
+enum
+{
+    BOX_0,
+    BOX_1,
+    BOX_CENTER,
+    BOX_3,
+    BOX_4,
+    BOX_HIDDEN,
+    BOX_DESTROY,
+};
+
+// structs
 struct EntryBoxData
 {
     u16 species;
@@ -59,9 +72,7 @@ struct PokedexView
     u8 entryBoxTop;
 };
 
-EWRAM_DATA static u32 *sPokedexTilemapPtr = NULL;
-EWRAM_DATA static struct PokedexView sPokedexViewData = {0};
-
+// windows and bgs
 enum Windows
 {
     WINDOW_SEEN,
@@ -136,6 +147,7 @@ static const struct BgTemplate sPokedexBgTemplates[] =
     },
 };
 
+// graphics data
 static const u16 sPokedexPalette[] = INCBIN_U16("graphics/pokedex_custom/tiles.gbapal");
 static const u32 sPokedexTiles[] = INCBIN_U32("graphics/pokedex_custom/tiles.4bpp.lz");
 static const u32 sPokedexTilemap[] = INCBIN_U32("graphics/pokedex_custom/tiles.bin.lz");
@@ -268,25 +280,35 @@ static const struct SpriteTemplate sNumberSpriteTemplate =
     .callback = SpriteCB_EntryNumber,
 };
 
+// constant data
 static const s8 sEntryBoxPositions[MAX_ENTRY_BOXES + 1][2] =
 {
-    [6] = {127, -23}, // used as negative index
+    [6] = {126, -23}, // used as negative index
     [0] = {126, 11},
     [1] = {118, 43},
     [2] = {110, 75},
     [3] = {118, 107},
     [4] = {126, 139},
-    [5] = {127, 171},
+    [5] = {126, 171}, // farther than x=127 wraps around
 };
 
+// ewram data
+EWRAM_DATA static u32 *sPokedexTilemapPtr = NULL;
+EWRAM_DATA static struct PokedexView sPokedexViewData = {0};
+
+// forward declarations
 static void MainCB2_Pokedex(void);
 static void VBlankCB_Pokedex(void);
 static void Task_OpenPokedex(u8 taskId);
 static void Task_ClosePokedex(u8 taskId);
+static void Task_PokedexScrollUp(u8 taskId);
+static void Task_PokedexScrollDown(u8 taskId);
+static void Task_PokedexFinishScrollUp(u8 taskId);
+static void Task_PokedexFinishScrollDown(u8 taskId);
 static void Task_PokedexWaitForKeypress(u8 taskId);
 static void LoadPokedexMainPageGfx(void);
 static void PrintSeenOwnCount(void);
-static void DrawWindows(void);
+static void CreatePokedexWindows(void);
 static void CreateSelectedMonFrontSprite(u32 species);
 static void UpdateSelectedMonFrontSprite(u32 species);
 static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species);
@@ -294,6 +316,7 @@ static void DestroyPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNumberOntoPokedexEntryBox(struct EntryBoxData *box);
 static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box);
+static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index);
 
 // UI functions
 static void MainCB2_Pokedex(void)
@@ -382,23 +405,113 @@ static void Task_OpenPokedex(u8 taskId)
         gTasks[taskId].func = Task_PokedexWaitForKeypress;
 }
 
-static void Task_PokedexWaitForKeypress(u8 taskId)
+static void Task_PokedexScrollUp(u8 taskId)
 {
     u32 i;
-    if (gMain.newKeys & A_BUTTON)
+    struct EntryBoxData *box;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
     {
-        // DestroyPokedexEntryBox(&sPokedexViewData.entryBoxes[sPokedexViewData.entryBoxTop]);
-        // sPokedexViewData.entryBoxes[sPokedexViewData.entryBoxTop].index = 5;
-        // sPokedexViewData.entryBoxes[sPokedexViewData.entryBoxTop].species = sPokedexViewData.entryBoxes[(sPokedexViewData.entryBoxTop + 5) % 6].species + 1;
-        // CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[sPokedexViewData.entryBoxTop], sPokedexViewData.entryBoxes[sPokedexViewData.entryBoxTop].species);
-        
-        for (i = 0; i < MAX_ENTRY_BOXES; ++i)
-        {
-            if (sPokedexViewData.entryBoxes[i].index > 0)
-                sPokedexViewData.entryBoxes[i].index -= 1;
-            else
-                sPokedexViewData.entryBoxes[i].index = 6;
-        }
+        box = &sPokedexViewData.entryBoxes[i];
+        if (box->species == SPECIES_NONE)
+            continue;
+        gSprites[box->leftSpriteId].y2 += 4;
+        if (box->index < BOX_CENTER)
+            gSprites[box->leftSpriteId].x2 -= 1;
+        else
+            gSprites[box->leftSpriteId].x2 += 1;
+    }
+
+    if (++gSprites[box->leftSpriteId].animDelayCounter >= 8)
+    {
+        gSprites[box->leftSpriteId].animDelayCounter = 0;
+        gTasks[taskId].func = Task_PokedexFinishScrollUp;
+    }
+}
+
+static void Task_PokedexScrollDown(u8 taskId)
+{
+    u32 i;
+    struct EntryBoxData *box;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
+    {
+        box = &sPokedexViewData.entryBoxes[i];
+        if (box->species == SPECIES_NONE)
+            continue;
+        gSprites[box->leftSpriteId].y2 -= 4;
+        if (box->index <= BOX_CENTER)
+            gSprites[box->leftSpriteId].x2 += 1;
+        else if (box->index < BOX_HIDDEN)
+            gSprites[box->leftSpriteId].x2 -= 1;
+    }
+
+    if (++gSprites[box->leftSpriteId].animDelayCounter >= 8)
+    {
+        gSprites[box->leftSpriteId].animDelayCounter = 0;
+        gTasks[taskId].func = Task_PokedexFinishScrollDown;
+    }
+}
+
+static void Task_PokedexFinishScrollUp(u8 taskId)
+{
+    u32 i;
+    struct EntryBoxData *box;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
+    {
+        box = &sPokedexViewData.entryBoxes[i];
+        // Change indices.
+        if (box->index < BOX_HIDDEN)
+            box->index += 1;
+        else
+            box->index = BOX_0;
+
+        // Update positions.
+        gSprites[box->leftSpriteId].x = sEntryBoxPositions[box->index][0];
+        gSprites[box->leftSpriteId].y = sEntryBoxPositions[box->index][1];
+        gSprites[box->leftSpriteId].x2 = 0;
+        gSprites[box->leftSpriteId].y2 = 0;
+
+        // Update front pic.
+        if (box->index == BOX_CENTER)
+            UpdateSelectedMonFrontSprite(box->species);
+    }
+    gTasks[taskId].func = Task_PokedexWaitForKeypress;
+}
+
+static void Task_PokedexFinishScrollDown(u8 taskId)
+{
+    u32 i;
+    struct EntryBoxData *box;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
+    {
+        box = &sPokedexViewData.entryBoxes[i];
+        // Change indices.
+        if (box->index > BOX_0)
+            box->index -= 1;
+        else
+            box->index = BOX_HIDDEN;
+
+        // Update positions.
+        gSprites[box->leftSpriteId].x = sEntryBoxPositions[box->index][0];
+        gSprites[box->leftSpriteId].y = sEntryBoxPositions[box->index][1];
+        gSprites[box->leftSpriteId].x2 = 0;
+        gSprites[box->leftSpriteId].y2 = 0;
+
+        // Update front pic.
+        if (box->index == BOX_CENTER)
+            UpdateSelectedMonFrontSprite(box->species);
+    }
+    gTasks[taskId].func = Task_PokedexWaitForKeypress;
+}
+
+static void Task_PokedexWaitForKeypress(u8 taskId)
+{
+    if (gMain.heldKeys & DPAD_UP)
+    {
+        gTasks[taskId].func = Task_PokedexScrollUp;
+    }
+    if (gMain.heldKeys & DPAD_DOWN)
+    {
+        gTasks[taskId].func = Task_PokedexScrollDown;        
     }
     if (gMain.newKeys & B_BUTTON)
     {
@@ -410,9 +523,10 @@ static void Task_PokedexWaitForKeypress(u8 taskId)
 
 static void Task_ClosePokedex(u8 taskId)
 {
-    // Free tilemap pointer.
+    // Free tilemap pointer and data.
     Free(sPokedexTilemapPtr);
     sPokedexTilemapPtr = NULL;
+    CpuFill32(0, &sPokedexViewData, sizeof(sPokedexViewData));
 
     // Reset data and destroy task.
     FreeAllWindowBuffers();
@@ -438,19 +552,19 @@ static void LoadPokedexMainPageGfx(void)
     sPokedexViewData.entryBoxes[4].index = sPokedexViewData.entryBoxes[4].arrIndex = 4;
     sPokedexViewData.entryBoxes[5].index = sPokedexViewData.entryBoxes[5].arrIndex = 5;
 
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], 1);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[1], 2);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], 3);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], 4);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], 5);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], 6);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[0], SPECIES_BULBASAUR);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[1], SPECIES_BULBASAUR + 1);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], SPECIES_BULBASAUR + 2);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], SPECIES_BULBASAUR + 3);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], SPECIES_BULBASAUR + 4);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], SPECIES_BULBASAUR + 5);
 
-    CreateSelectedMonFrontSprite(1);
-    DrawWindows();
+    CreateSelectedMonFrontSprite(SPECIES_BULBASAUR + 2);
+    CreatePokedexWindows();
     PrintSeenOwnCount();
 }
 
-static void DrawWindows(void)
+static void CreatePokedexWindows(void)
 {
     u32 i, windowId;
     for (i = 0; i < WINDOW_COUNT; ++i)
@@ -483,47 +597,16 @@ static void CreateSelectedMonFrontSprite(u32 species)
 
 static void UpdateSelectedMonFrontSprite(u32 species)
 {
-    FreeAndDestroyMonPicSprite(sPokedexViewData.selectedMonSpriteId);
+    sPokedexViewData.selectedSpecies = species;
+    FreeAndDestroyMonPicSprite(sPokedexViewData.selectedMonSpriteId); // sprite sometimes destroyed frame after palette
     sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
 }
 
-#define sArrIndex       data[0] // for left sprites
 #define sLeftSpriteId   data[0] // for middle, right, icon, number, and ball sprites
 #define sDigitId        data[1] // for numbers
 
 #define VRAM_OFFSET_LEFT_SPRITE (512 + 32 * 4)     // each increment of 32 pushes text forward one tile
 #define VRAM_OFFSET_RIGHT_SPRITE (512)
-
-static void SpriteCB_EntryBoxLeft(struct Sprite *sprite)
-{
-    // If index changed, move by fixed offset to get into right position (hopefully).
-    if (sprite->x != sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][0]
-        && (++sprite->animDelayCounter) < 8)
-    {
-        if (sprite->x + sprite->x2 < sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][0])
-            ++sprite->x2;
-        else if (sprite->x + sprite->x2 > sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][0])
-            --sprite->x2;
-    
-        sprite->y2 -= 4;
-    }
-    // Once moved to correct position, update actual coordinates.
-    else
-    {
-        sprite->x = sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][0];
-        sprite->y = sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][1];
-        sprite->x2 = 0;
-        sprite->y2 = 0;
-        sprite->animDelayCounter = 0;
-    }
-    // If moved behind BG, wrap around to bottom. 
-    if (sprite->y + sprite->y2 < -10 && sPokedexViewData.entryBoxes[sprite->sArrIndex].index == 6)
-    {
-        sPokedexViewData.entryBoxes[sprite->sArrIndex].index = 5;
-        sprite->x = sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][0];
-        sprite->y = sEntryBoxPositions[sPokedexViewData.entryBoxes[sprite->sArrIndex].index][1];
-    }
-}
 
 static void SpriteCB_EntryBoxMiddle(struct Sprite *sprite)
 {
@@ -545,17 +628,15 @@ static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species)
 {
     box->species = species;
 
-    LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntryBoxes[box->index]);
-    box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->index], sEntryBoxPositions[box->index][0], sEntryBoxPositions[box->index][1], 16);
-    gSprites[box->leftSpriteId].sArrIndex = box->arrIndex;
-    gSprites[box->leftSpriteId].callback = SpriteCB_EntryBoxLeft;
+    LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntryBoxes[box->arrIndex]);
+    box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->arrIndex], sEntryBoxPositions[box->index][0], sEntryBoxPositions[box->index][1], 16);
 
-    box->middleSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->index], 0, 0, 16);
+    box->middleSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->arrIndex], 0, 0, 16);
     gSprites[box->middleSpriteId].sLeftSpriteId = box->leftSpriteId;
     gSprites[box->middleSpriteId].oam.tileNum += 32;
     gSprites[box->middleSpriteId].callback = SpriteCB_EntryBoxMiddle;
 
-    box->rightSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->index], 0, 0, 16);
+    box->rightSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->arrIndex], 0, 0, 16);
     gSprites[box->rightSpriteId].sLeftSpriteId = box->leftSpriteId;
     gSprites[box->rightSpriteId].oam.tileNum += 64;
     gSprites[box->rightSpriteId].callback = SpriteCB_EntryBoxRight;
@@ -679,6 +760,17 @@ static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
     box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
     gSprites[box->iconSpriteId].oam.priority = 3;
     gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
+}
+
+static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index)
+{
+    u32 i;
+    for (i = 0; i < MAX_ENTRY_BOXES; ++i)
+    {
+        if (sPokedexViewData.entryBoxes[i].index == index)
+            return &sPokedexViewData.entryBoxes[i];
+    }
+    return NULL;
 }
 
 #undef sLeftSpriteId
