@@ -636,14 +636,20 @@ static void PrintSeenOwnCount(void)
 static void CreateSelectedMonFrontSprite(u32 species)
 {
     sPokedexViewData.selectedSpecies = species;
-    sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+    if (GetSetPokedexFlag(species, FLAG_GET_SEEN))
+        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+    else
+        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
 }
 
 static void UpdateSelectedMonFrontSprite(u32 species)
 {
     sPokedexViewData.selectedSpecies = species;
     FreeAndDestroyMonPicSprite(sPokedexViewData.selectedMonSpriteId); // sprite sometimes destroyed frame after palette
-    sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+    if (GetSetPokedexFlag(species, FLAG_GET_SEEN))
+        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+    else
+        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
 }
 
 #define sLeftSpriteId   data[0] // for middle, right, icon, number, and ball sprites
@@ -702,29 +708,41 @@ static void DestroyPokedexEntryBox(struct EntryBoxData *box)
     DestroySprite(&gSprites[box->rightSpriteId]);
 }
 
+static const u8 sTextColor_Name[] = {2, 1, 0}; // black bg, white text
+
 static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box)
 {
     u8 *windowTileData;
     void *objVram;
-    u32 windowId;
-    u8 color[] = {2, 1, 0}; // black bg, white text
+    u32 windowId, length;
     struct WindowTemplate winTemplate = sPokedexEntryWinTemplate;
+    u8 *txtPtr = NULL;
+    const u8 *speciesName;
 
     // Set up text.
-    u8 *txtPtr = NULL;
-    const u8 *speciesName = GetSpeciesName(box->species);
-    u32 length = StringLength(speciesName);
-    StringCopy(gStringVar3, speciesName);
-    if (length > 4)
+    if (!GetSetPokedexFlag(box->species, FLAG_GET_SEEN))
     {
-        StringCopy(gStringVar4, speciesName);
-        txtPtr = &gStringVar4[4];
+        StringCopy(gStringVar3, COMPOUND_STRING("----"));
+        StringCopy(gStringVar4, COMPOUND_STRING("------"));
+        txtPtr = gStringVar4;
+        length = 10;
+    }
+    else
+    {
+        speciesName = GetSpeciesName(box->species);
+        StringCopy(gStringVar3, speciesName);
+        length = StringLength(speciesName);
+        if (length > 4)
+        {
+            StringCopy(gStringVar4, speciesName);
+            txtPtr = &gStringVar4[4];
+        }
     }
 
     // Print first four characters onto left sprite.
     windowId = AddWindow(&winTemplate);
     FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
-    AddTextPrinterParameterized4(windowId, FONT_NORMAL, 0, 4, 0, 0, color, TEXT_SKIP_DRAW, gStringVar3);
+    AddTextPrinterParameterized4(windowId, FONT_NORMAL, 0, 4, 0, 0, sTextColor_Name, TEXT_SKIP_DRAW, gStringVar3);
 
     objVram = (void *)(OBJ_VRAM0) + gSprites[box->leftSpriteId].oam.tileNum * TILE_SIZE_4BPP;
     windowTileData = (u8 *)(GetWindowAttribute(windowId, WINDOW_TILE_DATA));
@@ -736,7 +754,7 @@ static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box)
     {
         windowId = AddWindow(&winTemplate);
         FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
-        AddTextPrinterParameterized4(windowId, FONT_NORMAL, 0, 4, 0, 0, color, TEXT_SKIP_DRAW, txtPtr);
+        AddTextPrinterParameterized4(windowId, FONT_NORMAL, 0, 4, 0, 0, sTextColor_Name, TEXT_SKIP_DRAW, txtPtr);
 
         objVram = (void *)(OBJ_VRAM0) + gSprites[box->middleSpriteId].oam.tileNum * TILE_SIZE_4BPP;
         windowTileData = (u8 *)(GetWindowAttribute(windowId, WINDOW_TILE_DATA));
@@ -800,10 +818,13 @@ static void SpriteCB_MonIconDex(struct Sprite *sprite)
 
 static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
 {
-    LoadMonIconPalette(box->species);
-    box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
-    gSprites[box->iconSpriteId].oam.priority = 3;
-    gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
+    if (GetSetPokedexFlag(box->species, FLAG_GET_SEEN))
+    {
+        LoadMonIconPalette(box->species);
+        box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
+        gSprites[box->iconSpriteId].oam.priority = 3;
+        gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
+    }
 }
 
 static void InitPokedexEntryBoxData(void)
