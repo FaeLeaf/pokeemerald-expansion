@@ -5,6 +5,7 @@
 #include "dma3.h"
 #include "event_data.h"
 #include "field_weather.h"
+#include "gpu_regs.h"
 #include "graphics.h"
 #include "main.h"
 #include "map_name_popup.h"
@@ -14,6 +15,7 @@
 #include "pokedex.h"
 #include "pokemon_icon.h"
 #include "region_map.h"
+#include "scanline_effect.h"
 #include "sound.h"
 #include "string_util.h"
 #include "strings.h"
@@ -2272,6 +2274,44 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
             *endOfString = EOS;
             break;
     }
+}
+
+void ClearTasksAndGraphicalStructs(void)
+{
+	ScanlineEffect_Stop();
+	ResetTasks();
+	ResetSpriteData();
+	ResetTempTileDataBuffers();
+	ResetPaletteFade();
+	FreeAllSpritePalettes();
+}
+
+void ClearVramOamPlttRegs(void)
+{
+    DmaClearLarge16(3, (void *)(VRAM), VRAM_SIZE, 0x1000);
+    DmaClear32(3, OAM, OAM_SIZE);
+    DmaClear16(3, PLTT, PLTT_SIZE);
+
+    SetGpuReg(REG_OFFSET_DISPCNT, 0);
+    SetGpuReg(REG_OFFSET_BG0CNT, 0);
+    SetGpuReg(REG_OFFSET_BG0HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+    SetGpuReg(REG_OFFSET_BG1CNT, 0);
+    SetGpuReg(REG_OFFSET_BG1HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG1VOFS, 0);
+    SetGpuReg(REG_OFFSET_BG2CNT, 0);
+    SetGpuReg(REG_OFFSET_BG2HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG2VOFS, 0);
+    SetGpuReg(REG_OFFSET_BG3CNT, 0);
+    SetGpuReg(REG_OFFSET_BG3HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG3VOFS, 0);
+    SetGpuReg(REG_OFFSET_WIN0H, 0);
+    SetGpuReg(REG_OFFSET_WIN0V, 0);
+    SetGpuReg(REG_OFFSET_WININ, 0);
+    SetGpuReg(REG_OFFSET_WINOUT, 0);
+    SetGpuReg(REG_OFFSET_BLDCNT, 0);
+    SetGpuReg(REG_OFFSET_BLDALPHA, 0);
+    SetGpuReg(REG_OFFSET_BLDY, 0);
 }
 
 // BW map pop-ups
