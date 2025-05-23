@@ -198,7 +198,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .bodyColor = BODY_COLOR_GREEN,
         .speciesName = _("ALLILEAF"),
         .cryId = CRY_NONE,
-        .natDexNum = NATIONAL_DEX_NONE,
+        .natDexNum = NATIONAL_DEX_ALLILEAF,
         .categoryName = _("Moss"),
         .height = 5,
         .weight = 67,
@@ -217,7 +217,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .trainerOffset = 0,
         .frontPic = gMonFrontPic_Allileaf,
         .frontPicSize = MON_COORDS_SIZE(40, 40),
-        .frontPicYOffset = 12,
+        .frontPicYOffset = 8,
         .frontAnimFrames = sAnims_TwoFramePlaceHolder,
         .frontAnimId = ANIM_BACK_AND_LUNGE,
         .backPic = gMonBackPic_Allileaf,
@@ -256,6 +256,16 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .eggMoveLearnset = sNoneEggMoveLearnset,
     },
 
+    [SPECIES_CROCOFROND] =
+    {
+        .natDexNum = NATIONAL_DEX_CROCOFROND,
+    },
+
+    [SPECIES_GRASS_FINAL] =
+    {
+        .natDexNum = NATIONAL_DEX_GRASS_EVO,
+    },
+
     [SPECIES_LAVASAUR] =
     {
         .baseHP        = 45,
@@ -277,7 +287,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .bodyColor = BODY_COLOR_GREEN,
         .speciesName = _("LAVASAUR"),
         .cryId = CRY_NONE,
-        .natDexNum = NATIONAL_DEX_NONE,
+        .natDexNum = NATIONAL_DEX_LAVASAUR,
         .categoryName = _("Volcano"),
         .height = 10,
         .weight = 195,
@@ -289,7 +299,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .trainerOffset = 0,
         .frontPic = gMonFrontPic_Lavasaur,
         .frontPicSize = MON_COORDS_SIZE(40, 40),
-        .frontPicYOffset = 9,
+        .frontPicYOffset = 5,
         .frontAnimFrames = sAnims_TwoFramePlaceHolder,
         .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
         .backPic = gMonFrontPic_Lavasaur,
