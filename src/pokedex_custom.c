@@ -530,8 +530,14 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         box->leftSpriteId = 0xFF;
     }
 
-    // Continue scrolling until the next seen species.
-    if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
+    // Allow exit or continue scrolling until the next seen species.
+    if (gMain.heldKeys & B_BUTTON)
+    {
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+        gTasks[taskId].func = Task_ClosePokedex;
+        PlaySE(SE_PC_OFF);
+    }
+    else if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
         || (gMain.heldKeys & DPAD_UP && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex > 0))
     {
         if (gTasks[taskId].tConsecutiveScrolls < 3)
@@ -600,8 +606,14 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         box->leftSpriteId = 0xFF;
     }
 
-    // Continue scrolling until the next seen species.
-    if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
+    // Allow exit or continue scrolling until the next seen species.
+    if (gMain.heldKeys & B_BUTTON)
+    {
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+        gTasks[taskId].func = Task_ClosePokedex;
+        PlaySE(SE_PC_OFF);
+    }
+    else if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
         || (gMain.heldKeys & DPAD_DOWN && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex < sPokedexViewData.pokedexListCount - 1))
     {
         if (gTasks[taskId].tConsecutiveScrolls < 3)
