@@ -105,9 +105,9 @@ static const struct WindowTemplate sPokedexWinTemplates[WINDOW_COUNT + 1] =
     [WINDOW_SEEN] =
     {
         .bg = 1,
-        .tilemapLeft = 4,
+        .tilemapLeft = 3,
         .tilemapTop = 12,
-        .width = 4,
+        .width = 5,
         .height = 2,
         .paletteNum = 15,
         .baseBlock = 1 + 16,
@@ -115,12 +115,12 @@ static const struct WindowTemplate sPokedexWinTemplates[WINDOW_COUNT + 1] =
     [WINDOW_OWN] =
     {
         .bg = 1,
-        .tilemapLeft = 4,
+        .tilemapLeft = 3,
         .tilemapTop = 15,
-        .width = 4,
-        .height = 2,
+        .width = 5,
+        .height = 3,
         .paletteNum = 15,
-        .baseBlock = 1 + 16 + 8,
+        .baseBlock = 1 + 16 + 10,
     },
     DUMMY_WIN_TEMPLATE,
 };
@@ -737,13 +737,13 @@ static const u8 sTextColor_Normal[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,
 static void PrintSeenOwnCount(void)
 {
     // Print SEEN count.
-    ConvertIntToDecimalStringN(gStringVar4, GetNationalPokedexCount(FLAG_GET_SEEN), STR_CONV_MODE_LEFT_ALIGN, 3);
+    ConvertIntToDecimalStringN(gStringVar4, GetNationalPokedexCount(FLAG_GET_SEEN), STR_CONV_MODE_RIGHT_ALIGN, 4);
     AddTextPrinterParameterized3(WINDOW_SEEN, FONT_NORMAL, 4, 3, sTextColor_Normal, TEXT_SKIP_DRAW, gStringVar4);
     CopyWindowToVram(WINDOW_SEEN, COPYWIN_FULL);
 
     // Print OWN count.
-    ConvertIntToDecimalStringN(gStringVar4, GetNationalPokedexCount(FLAG_GET_CAUGHT), STR_CONV_MODE_LEFT_ALIGN, 3);
-    AddTextPrinterParameterized3(WINDOW_OWN, FONT_NORMAL, 4, 4, sTextColor_Normal, TEXT_SKIP_DRAW, gStringVar4);
+    ConvertIntToDecimalStringN(gStringVar4, GetNationalPokedexCount(FLAG_GET_CAUGHT), STR_CONV_MODE_RIGHT_ALIGN, 4);
+    AddTextPrinterParameterized3(WINDOW_OWN, FONT_NORMAL, 4, 5, sTextColor_Normal, TEXT_SKIP_DRAW, gStringVar4);
     CopyWindowToVram(WINDOW_OWN, COPYWIN_FULL);
 }
 
