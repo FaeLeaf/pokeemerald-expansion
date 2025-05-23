@@ -414,23 +414,32 @@ static void Task_OpenPokedex(u8 taskId)
         gTasks[taskId].func = Task_PokedexWaitForKeypress;
 }
 
+#define tConsecutiveScrolls data[0]
+
 static void Task_PokedexScrollUp(u8 taskId)
 {
-    u32 i;
+    u32 i, scrollMult;
     struct EntryBoxData *box;
+
+    if (gTasks[taskId].tConsecutiveScrolls >= 3)
+        scrollMult = 2;
+    else
+        scrollMult = 1;
+
     for (i = 0; i < MAX_ENTRY_BOXES; ++i)
     {
         box = &sPokedexViewData.entryBoxes[i];
         if (box->dexIndex == NATIONAL_DEX_COUNT)
             continue;
-        gSprites[box->leftSpriteId].y2 += 4;
+        gSprites[box->leftSpriteId].y2 += 4 * scrollMult;
         if (box->index < BOX_CENTER)
-            gSprites[box->leftSpriteId].x2 -= 1;
+            gSprites[box->leftSpriteId].x2 -= 1 * scrollMult;
         else
-            gSprites[box->leftSpriteId].x2 += 1;
+            gSprites[box->leftSpriteId].x2 += 1 * scrollMult;
     }
 
-    if (++gSprites[box->leftSpriteId].animDelayCounter >= 8)
+    gSprites[box->leftSpriteId].animDelayCounter += 1 * scrollMult;
+    if (gSprites[box->leftSpriteId].animDelayCounter >= 8)
     {
         gSprites[box->leftSpriteId].animDelayCounter = 0;
         gTasks[taskId].func = Task_PokedexFinishScrollUp;
@@ -439,21 +448,28 @@ static void Task_PokedexScrollUp(u8 taskId)
 
 static void Task_PokedexScrollDown(u8 taskId)
 {
-    u32 i;
+    u32 i, scrollMult;
     struct EntryBoxData *box;
+
+    if (gTasks[taskId].tConsecutiveScrolls >= 3)
+        scrollMult = 2;
+    else
+        scrollMult = 1;
+
     for (i = 0; i < MAX_ENTRY_BOXES; ++i)
     {
         box = &sPokedexViewData.entryBoxes[i];
         if (box->dexIndex == NATIONAL_DEX_COUNT)
             continue;
-        gSprites[box->leftSpriteId].y2 -= 4;
+        gSprites[box->leftSpriteId].y2 -= 4 * scrollMult;
         if (box->index <= BOX_CENTER)
-            gSprites[box->leftSpriteId].x2 += 1;
+            gSprites[box->leftSpriteId].x2 += 1 * scrollMult;
         else if (box->index < BOX_HIDDEN)
-            gSprites[box->leftSpriteId].x2 -= 1;
+            gSprites[box->leftSpriteId].x2 -= 1 * scrollMult;
     }
 
-    if (++gSprites[box->leftSpriteId].animDelayCounter >= 8)
+    gSprites[box->leftSpriteId].animDelayCounter += 1 * scrollMult;
+    if (gSprites[box->leftSpriteId].animDelayCounter >= 8)
     {
         gSprites[box->leftSpriteId].animDelayCounter = 0;
         gTasks[taskId].func = Task_PokedexFinishScrollDown;
@@ -515,14 +531,18 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
     }
 
     // Continue scrolling until the next seen species.
-    if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+    if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
+        || (gMain.heldKeys & DPAD_UP && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex > 0))
     {
-        gTasks[taskId].func = Task_PokedexWaitForKeypress;
+        if (gTasks[taskId].tConsecutiveScrolls < 3)
+            ++gTasks[taskId].tConsecutiveScrolls;
+        PlaySE(SE_DEX_SCROLL);
+        gTasks[taskId].func = Task_PokedexScrollUp;
     }
     else
     {
-        PlaySE(SE_DEX_SCROLL);
-        gTasks[taskId].func = Task_PokedexScrollUp;
+        gTasks[taskId].tConsecutiveScrolls = 0;
+        gTasks[taskId].func = Task_PokedexWaitForKeypress;
     }
 }
 
@@ -581,16 +601,22 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
     }
 
     // Continue scrolling until the next seen species.
-    if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+    if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
+        || (gMain.heldKeys & DPAD_DOWN && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex < sPokedexViewData.pokedexListCount - 1))
     {
-        gTasks[taskId].func = Task_PokedexWaitForKeypress;
-    }
-    else
-    {
+        if (gTasks[taskId].tConsecutiveScrolls < 3)
+            ++gTasks[taskId].tConsecutiveScrolls;
         PlaySE(SE_DEX_SCROLL);
         gTasks[taskId].func = Task_PokedexScrollDown;
     }
+    else
+    {
+        gTasks[taskId].tConsecutiveScrolls = 0;
+        gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    }
 }
+
+#undef tConsecutiveScrolls
 
 static void Task_PokedexWaitForKeypress(u8 taskId)
 {
