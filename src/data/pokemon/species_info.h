@@ -177,6 +177,157 @@ const struct SpeciesInfo gSpeciesInfo[] =
 
     /* You may add any custom species below this point based on the following structure: */
 
+    [SPECIES_ALLILEAF] =
+    {
+        .baseHP        = 65,
+        .baseAttack    = 60,
+        .baseDefense   = 55,
+        .baseSpeed     = 30,
+        .baseSpAttack  = 45,
+        .baseSpDefense = 55,
+        .types = MON_TYPES(TYPE_GRASS),
+        .catchRate = 45,
+        .expYield = 64,
+        .evYield_Attack = 1,
+        .genderRatio = PERCENT_FEMALE(12.5),
+        .eggCycles = 20,
+        .friendship = STANDARD_FRIENDSHIP,
+        .growthRate = GROWTH_SLOW,
+        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_GRASS, EGG_GROUP_DRAGON),
+        .abilities = { ABILITY_OVERGROW, ABILITY_NONE, ABILITY_STRONG_JAW },
+        .bodyColor = BODY_COLOR_GREEN,
+        .speciesName = _("ALLILEAF"),
+        .cryId = CRY_NONE,
+        .natDexNum = NATIONAL_DEX_NONE,
+        .categoryName = _("Moss"),
+        .height = 5,
+        .weight = 67,
+        .description = COMPOUND_STRING(
+            "It can bite with its strong jaws when\n"
+            "provoked. There seems to be something\n"
+            "growing underneath the moss on its\n"
+            "back."),
+        // .description = COMPOUND_STRING(
+        //     "It can use thick vines to attack from\n"
+        //     "far away and bites at opponents that\n"
+        //     "get too close.\n"),
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+        .frontPic = gMonFrontPic_Allileaf,
+        .frontPicSize = MON_COORDS_SIZE(40, 40),
+        .frontPicYOffset = 12,
+        .frontAnimFrames = sAnims_TwoFramePlaceHolder,
+        .frontAnimId = ANIM_BACK_AND_LUNGE,
+        .backPic = gMonBackPic_Allileaf,
+        .backPicSize = MON_COORDS_SIZE(40, 40),
+        .backPicYOffset = 13,
+        .backAnimId = BACK_ANIM_NONE,
+        .palette = gMonPalette_Allileaf,
+        .shinyPalette = gMonShinyPalette_Allileaf,
+        .iconSprite = gMonIcon_Allileaf,
+        .iconPalIndex = 4,
+        .pokemonJumpType = PKMN_JUMP_TYPE_NONE,
+        FOOTPRINT(QuestionMark)
+        SHADOW(-1, 0, SHADOW_SIZE_M)
+    #if OW_POKEMON_OBJECT_EVENTS
+        .overworldData = {
+            .tileTag = TAG_NONE,
+            .paletteTag = OBJ_EVENT_PAL_TAG_SUBSTITUTE,
+            .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
+            .size = 512,
+            .width = 32,
+            .height = 32,
+            .paletteSlot = PALSLOT_NPC_1,
+            .shadowSize = SHADOW_SIZE_M,
+            .inanimate = FALSE,
+            .compressed = COMP,
+            .tracks = TRACKS_FOOT,
+            .oam = &gObjectEventBaseOam_32x32,
+            .subspriteTables = sOamTables_32x32,
+            .anims = sAnimTable_Following,
+            .images = sPicTable_Substitute,
+            .affineAnims = gDummySpriteAffineAnimTable,
+        },
+    #endif
+        .levelUpLearnset = sNoneLevelUpLearnset,
+        .teachableLearnset = sNoneTeachableLearnset,
+        .eggMoveLearnset = sNoneEggMoveLearnset,
+    },
+
+    [SPECIES_LAVASAUR] =
+    {
+        .baseHP        = 45,
+        .baseAttack    = 45,
+        .baseDefense   = 70,
+        .baseSpeed     = 45,
+        .baseSpAttack  = 60,
+        .baseSpDefense = 50,
+        .types = MON_TYPES(TYPE_FIRE),
+        .catchRate = 45,
+        .expYield = 64,
+        .evYield_Attack = 1,
+        .genderRatio = PERCENT_FEMALE(12.5),
+        .eggCycles = 20,
+        .friendship = STANDARD_FRIENDSHIP,
+        .growthRate = GROWTH_SLOW,
+        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD, EGG_GROUP_MINERAL),
+        .abilities = { ABILITY_BLAZE, ABILITY_NONE, ABILITY_MAGMA_ARMOR },
+        .bodyColor = BODY_COLOR_GREEN,
+        .speciesName = _("LAVASAUR"),
+        .cryId = CRY_NONE,
+        .natDexNum = NATIONAL_DEX_NONE,
+        .categoryName = _("Volcano"),
+        .height = 10,
+        .weight = 195,
+        .description = COMPOUND_STRING(
+            "..."),
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+        .frontPic = gMonFrontPic_Lavasaur,
+        .frontPicSize = MON_COORDS_SIZE(40, 40),
+        .frontPicYOffset = 9,
+        .frontAnimFrames = sAnims_TwoFramePlaceHolder,
+        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
+        .backPic = gMonFrontPic_Lavasaur,
+        .backPicSize = MON_COORDS_SIZE(40, 40),
+        .backPicYOffset = 13,
+        .backAnimId = BACK_ANIM_NONE,
+        .palette = gMonPalette_Lavasaur,
+        .shinyPalette = gMonShinyPalette_Lavasaur,
+        .iconSprite = gMonIcon_Lavasaur,
+        .iconPalIndex = 0,
+        .pokemonJumpType = PKMN_JUMP_TYPE_NONE,
+        FOOTPRINT(QuestionMark)
+        SHADOW(1, 3, SHADOW_SIZE_M)
+    #if OW_POKEMON_OBJECT_EVENTS
+        .overworldData = {
+            .tileTag = TAG_NONE,
+            .paletteTag = OBJ_EVENT_PAL_TAG_SUBSTITUTE,
+            .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
+            .size = 512,
+            .width = 32,
+            .height = 32,
+            .paletteSlot = PALSLOT_NPC_1,
+            .shadowSize = SHADOW_SIZE_M,
+            .inanimate = FALSE,
+            .compressed = COMP,
+            .tracks = TRACKS_FOOT,
+            .oam = &gObjectEventBaseOam_32x32,
+            .subspriteTables = sOamTables_32x32,
+            .anims = sAnimTable_Following,
+            .images = sPicTable_Substitute,
+            .affineAnims = gDummySpriteAffineAnimTable,
+        },
+    #endif
+        .levelUpLearnset = sNoneLevelUpLearnset,
+        .teachableLearnset = sNoneTeachableLearnset,
+        .eggMoveLearnset = sNoneEggMoveLearnset,
+    },
+
     /*
     [SPECIES_NONE] =
     {

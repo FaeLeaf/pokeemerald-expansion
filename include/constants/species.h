@@ -1637,8 +1637,12 @@
 #define SPECIES_URSHIFU_RAPID_STRIKE_STYLE_GMAX         SPECIES_URSHIFU_RAPID_STRIKE_GMAX
 #define SPECIES_MIMIKYU_BUSTED_TOTEM                    1523
 #define SPECIES_MIMIKYU_TOTEM_BUSTED                    SPECIES_MIMIKYU_BUSTED_TOTEM
-
-#define SPECIES_EGG                                     (SPECIES_MIMIKYU_BUSTED_TOTEM + 1)
+// Camborea
+#define SPECIES_ALLILEAF                                1524
+#define SPECIES_CROCOFROND                              1525
+#define SPECIES_GRASS_FINAL                             1526
+#define SPECIES_LAVASAUR                                1527
+#define SPECIES_EGG                                     (SPECIES_LAVASAUR + 1)
 
 #define NUM_SPECIES SPECIES_EGG
 

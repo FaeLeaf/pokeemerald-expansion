@@ -4,6 +4,18 @@
 #define INCBIN_COMP INCBIN_U32
 #endif
 
+// Camborea
+const u32 gMonFrontPic_Allileaf[] = INCBIN_U32("graphics/pokemon/allileaf/anim_front.4bpp.lz");
+const u32 gMonBackPic_Allileaf[] = INCBIN_U32("graphics/pokemon/allileaf/back.4bpp.lz");
+const u16 gMonPalette_Allileaf[] = INCBIN_U16("graphics/pokemon/allileaf/anim_front.gbapal");
+const u16 gMonShinyPalette_Allileaf[] = INCBIN_U16("graphics/pokemon/allileaf/back.gbapal");
+const u8 gMonIcon_Allileaf[] = INCBIN_U8("graphics/pokemon/allileaf/icon.4bpp");
+
+const u32 gMonFrontPic_Lavasaur[] = INCBIN_U32("graphics/pokemon/lavasaur/anim_front.4bpp.lz");
+const u16 gMonPalette_Lavasaur[] = INCBIN_U16("graphics/pokemon/lavasaur/anim_front.gbapal");
+const u16 gMonShinyPalette_Lavasaur[] = INCBIN_U16("graphics/pokemon/lavasaur/anim_front.gbapal");
+const u8 gMonIcon_Lavasaur[] = INCBIN_U8("graphics/pokemon/lavasaur/icon.4bpp");
+
 const u32 gMonFrontPic_CircledQuestionMark[] = INCBIN_U32("graphics/pokemon/question_mark/circled/anim_front.4bpp.lz");
 const u32 gMonBackPic_CircledQuestionMark[] = INCBIN_U32("graphics/pokemon/question_mark/circled/back.4bpp.lz");
 const u16 gMonPalette_CircledQuestionMark[] = INCBIN_U16("graphics/pokemon/question_mark/circled/normal.gbapal");
