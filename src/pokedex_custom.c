@@ -38,6 +38,7 @@
 // constants
 #define TAG_POKEDEX_ENTRY   2000 // 2000-2006 used for each box
 #define TAG_NUMBER          2007
+#define TAG_CAUGHT_BALL     2008
 #define MAX_ENTRY_BOXES     6
 
 enum
@@ -48,7 +49,6 @@ enum
     BOX_3,
     BOX_4,
     BOX_HIDDEN,
-    BOX_DESTROY,
 };
 
 // structs
@@ -61,6 +61,7 @@ struct EntryBoxData
     u8 rightSpriteId;
     u8 iconSpriteId;
     u8 numberSpriteIds[3];
+    u8 ballSpriteId;
     u8 index;
     u8 arrIndex;
 };
@@ -165,6 +166,7 @@ static const u32 sPokedexEntryGfx[] = INCBIN_U32("graphics/pokedex_custom/entry.
 static const u16 sPokedexEntryPalette[] = INCBIN_U16("graphics/pokedex_custom/entry.gbapal");
 
 static const u8 sNumberGfx[] = INCBIN_U8("graphics/pokedex_custom/number.4bpp");
+static const u8 sCaughtBallGfx[] = INCBIN_U8("graphics/pokedex_custom/ball.4bpp");
 
 static u32 sBlackPal = RGB(0, 0, 0);
 
@@ -172,17 +174,22 @@ static const struct SpritePalette sSpritePalette_PokedexEntry = {sPokedexEntryPa
 
 static const struct CompressedSpriteSheet sSpriteSheet_PokedexEntryBoxes[] =
 {
-    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY},
-    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 1},
-    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 2},
-    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 3},
-    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 4},
-    {sPokedexEntryGfx, 0x1080, TAG_POKEDEX_ENTRY + 5},
+    {sPokedexEntryGfx, 0x1000, TAG_POKEDEX_ENTRY},
+    {sPokedexEntryGfx, 0x1000, TAG_POKEDEX_ENTRY + 1},
+    {sPokedexEntryGfx, 0x1000, TAG_POKEDEX_ENTRY + 2},
+    {sPokedexEntryGfx, 0x1000, TAG_POKEDEX_ENTRY + 3},
+    {sPokedexEntryGfx, 0x1000, TAG_POKEDEX_ENTRY + 4},
+    {sPokedexEntryGfx, 0x1000, TAG_POKEDEX_ENTRY + 5},
 };
 
 static const struct SpriteSheet sSpriteSheet_Number =
 {
     sNumberGfx, sizeof(sNumberGfx), TAG_NUMBER
+};
+
+static const struct SpriteSheet sSpriteSheet_CaughtBall =
+{
+    sCaughtBallGfx, sizeof(sCaughtBallGfx), TAG_CAUGHT_BALL
 };
 
 static const struct OamData sOamData_8x8 =
@@ -196,6 +203,23 @@ static const struct OamData sOamData_8x8 =
     .shape = SPRITE_SHAPE(8x8),
     .matrixNum = 0,
     .size = SPRITE_SIZE(8x8),
+    .tileNum = 0,
+    .priority = 3,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const struct OamData sOamData_16x16 =
+{
+    .x = 0,
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(16x16),
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(16x16),
     .tileNum = 0,
     .priority = 3,
     .paletteNum = 0,
@@ -289,6 +313,18 @@ static const struct SpriteTemplate sNumberSpriteTemplate =
     .callback = SpriteCB_EntryNumber,
 };
 
+static void SpriteCB_CaughtBall(struct Sprite*);
+static const struct SpriteTemplate sCaughtBallSpriteTemplate =
+{
+    .tileTag = TAG_CAUGHT_BALL,
+    .paletteTag = TAG_POKEDEX_ENTRY, // shares entry box pal
+    .oam = &sOamData_16x16,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_CaughtBall,
+};
+
 // constant data
 static const s8 sEntryBoxPositions[MAX_ENTRY_BOXES + 1][2] =
 {
@@ -326,6 +362,7 @@ static void DestroyPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNumberOntoPokedexEntryBox(struct EntryBoxData *box);
 static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box);
+static void CreateCaughtBallOnPokedexEntryBox(struct EntryBoxData *box);
 static void InitPokedexEntryBoxData(void);
 static struct EntryBoxData * GetFirstEmptyPokedexEntryBox(void);
 static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index);
@@ -510,6 +547,8 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         }
     }
 
+    if (sPokedexViewData.pokedexListCount > 4)
+    {
     // Create or update the top hidden entry box.
     box = GetPokedexEntryBoxByIndex(BOX_0);
     if (box == NULL)
@@ -532,6 +571,7 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         box->index = 0xFF;
         box->leftSpriteId = 0xFF;
     }
+}
 
     // Allow exit or continue scrolling until the next seen species.
     if (gMain.heldKeys & B_BUTTON)
@@ -540,7 +580,7 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         gTasks[taskId].func = Task_ClosePokedex;
         PlaySE(SE_PC_OFF);
     }
-    else if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
+    else if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(sPokedexViewData.selectedSpecies), FLAG_GET_SEEN)
         || (gMain.heldKeys & DPAD_UP && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex > 0))
     {
         if (gTasks[taskId].tConsecutiveScrolls < 3)
@@ -587,27 +627,30 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         }
     }
 
-    // Create or update the bottom hidden entry box.
-    box = GetPokedexEntryBoxByIndex(BOX_HIDDEN);
-    if (box == NULL)
+    // Create or update the bottom hidden entry box, if there are enough species seen.
+    if (sPokedexViewData.pokedexListCount > 4)
     {
-        box = GetFirstEmptyPokedexEntryBox();
-        box->index = BOX_HIDDEN;
-        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_HIDDEN-1)->dexIndex + 1);
-    }
-    else if (box->dexIndex < sPokedexViewData.pokedexListCount - MAX_ENTRY_BOXES)
-    {
-        box->dexIndex += MAX_ENTRY_BOXES;
-        DestroyPokedexEntryBox(box);
-        CreatePokedexEntryBox(box, box->dexIndex);
-    }
-    else // Or destroy it if there is nothing left in the list.
-    {
-        DestroyPokedexEntryBox(box);
-        box->species = SPECIES_NONE;
-        box->dexIndex = NATIONAL_DEX_COUNT;
-        box->index = 0xFF;
-        box->leftSpriteId = 0xFF;
+        box = GetPokedexEntryBoxByIndex(BOX_HIDDEN);
+        if (box == NULL)
+        {
+            box = GetFirstEmptyPokedexEntryBox();
+            box->index = BOX_HIDDEN;
+            CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_HIDDEN-1)->dexIndex + 1);
+        }
+        else if (box->dexIndex + MAX_ENTRY_BOXES < sPokedexViewData.pokedexListCount)
+        {
+            box->dexIndex += MAX_ENTRY_BOXES;
+            DestroyPokedexEntryBox(box);
+            CreatePokedexEntryBox(box, box->dexIndex);
+        }
+        else // Or destroy it if there is nothing left in the list.
+        {
+            DestroyPokedexEntryBox(box);
+            box->species = SPECIES_NONE;
+            box->dexIndex = NATIONAL_DEX_COUNT;
+            box->index = 0xFF;
+            box->leftSpriteId = 0xFF;
+        }
     }
 
     // Allow exit or continue scrolling until the next seen species.
@@ -617,7 +660,7 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         gTasks[taskId].func = Task_ClosePokedex;
         PlaySE(SE_PC_OFF);
     }
-    else if (!GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN)
+    else if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(sPokedexViewData.selectedSpecies), FLAG_GET_SEEN)
         || (gMain.heldKeys & DPAD_DOWN && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex < sPokedexViewData.pokedexListCount - 1))
     {
         if (gTasks[taskId].tConsecutiveScrolls < 3)
@@ -687,7 +730,7 @@ static void Task_UpdateSelectedMonFrontSprite(u8 taskId)
 
 static void Task_UpdateSelectedMonFrontSprite_Finish(u8 taskId)
 {
-    if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+    if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(sPokedexViewData.selectedSpecies), FLAG_GET_SEEN))
         sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(sPokedexViewData.selectedSpecies, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
     else
         sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
@@ -701,19 +744,17 @@ static void LoadPokedexMainPageGfx(void)
 {
     LoadSpritePalette(&sSpritePalette_PokedexEntry);
     LoadSpriteSheet(&sSpriteSheet_Number);
+    LoadSpriteSheet(&sSpriteSheet_CaughtBall);
 
     SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT2_ALL);
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(8, 10));
 
-    sPokedexViewData.entryBoxes[2].index = 2;
-    sPokedexViewData.entryBoxes[3].index = 3;
-    sPokedexViewData.entryBoxes[4].index = 4;
-    sPokedexViewData.entryBoxes[5].index = 5;
-
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], 0);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], 1);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], 2);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], 3);
+    u32 i = BOX_CENTER;
+    do
+    {
+        sPokedexViewData.entryBoxes[i].index = i;
+        CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[i], i - BOX_CENTER);
+    } while (++i < MAX_ENTRY_BOXES && (i - BOX_CENTER) < sPokedexViewData.pokedexListCount);
 
     CreateSelectedMonFrontSprite(GetPokedexEntryBoxByIndex(BOX_CENTER)->species);
     gSprites[GetPokedexEntryBoxByIndex(BOX_CENTER)->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
@@ -750,7 +791,7 @@ static void PrintSeenOwnCount(void)
 static void CreateSelectedMonFrontSprite(u32 species)
 {
     sPokedexViewData.selectedSpecies = species;
-    if (GetSetPokedexFlag(species, FLAG_GET_SEEN))
+    if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))
         sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
     else
         sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
@@ -802,6 +843,7 @@ static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 dexIndex)
     PrintNameOntoPokedexEntryBox(box);
     CreateMonIconOnPokedexEntryBox(box);
     PrintNumberOntoPokedexEntryBox(box);
+    CreateCaughtBallOnPokedexEntryBox(box);
 }
 
 static void DestroyPokedexEntryBox(struct EntryBoxData *box)
@@ -813,6 +855,7 @@ static void DestroyPokedexEntryBox(struct EntryBoxData *box)
     DestroySprite(&gSprites[box->leftSpriteId]);
     DestroySprite(&gSprites[box->middleSpriteId]);
     DestroySprite(&gSprites[box->rightSpriteId]);
+    DestroySprite(&gSprites[box->ballSpriteId]);
 }
 
 static const u8 sTextColor_Name[] = {2, 1, 0}; // black bg, white text
@@ -919,7 +962,7 @@ static void SpriteCB_MonIconDex(struct Sprite *sprite)
 {
     UpdateMonIconFrame(sprite);
     sprite->x = gSprites[sprite->sLeftSpriteId].x - 18;
-    sprite->y = gSprites[sprite->sLeftSpriteId].y - 1;
+    sprite->y = gSprites[sprite->sLeftSpriteId].y - 2;
     sprite->x2 = gSprites[sprite->sLeftSpriteId].x2;
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
     sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
@@ -933,6 +976,24 @@ static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
         box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
         gSprites[box->iconSpriteId].oam.priority = 3;
         gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
+    }
+}
+
+static void SpriteCB_CaughtBall(struct Sprite* sprite)
+{
+    sprite->x = gSprites[sprite->sLeftSpriteId].x + 95;
+    sprite->y = gSprites[sprite->sLeftSpriteId].y + 1;
+    sprite->x2 = gSprites[sprite->sLeftSpriteId].x2;
+    sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
+    sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
+}
+
+static void CreateCaughtBallOnPokedexEntryBox(struct EntryBoxData *box)
+{
+    if (sPokedexViewData.pokedexList[box->dexIndex].owned)
+    {
+        box->ballSpriteId = CreateSprite(&sCaughtBallSpriteTemplate, 0, 0, 0);
+        gSprites[box->ballSpriteId].sLeftSpriteId = box->leftSpriteId;
     }
 }
 
