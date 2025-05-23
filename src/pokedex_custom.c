@@ -54,6 +54,7 @@ enum
 // structs
 struct EntryBoxData
 {
+    u16 dexIndex;
     u16 species;
     u8 leftSpriteId;
     u8 middleSpriteId;
@@ -64,12 +65,20 @@ struct EntryBoxData
     u8 arrIndex;
 };
 
+struct PokedexListItem
+{
+    u16 dexNum;
+    u16 seen:1;
+    u16 owned:1;
+};
+
 struct PokedexView
 {
     u16 selectedSpecies;
     u8 selectedMonSpriteId;
-    struct EntryBoxData entryBoxes[MAX_ENTRY_BOXES]; // circular array
-    u8 entryBoxTop;
+    struct EntryBoxData entryBoxes[MAX_ENTRY_BOXES];
+    struct PokedexListItem pokedexList[NATIONAL_DEX_COUNT + 1];
+    u16 pokedexListCount;
 };
 
 // windows and bgs
@@ -319,6 +328,7 @@ static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box);
 static void InitPokedexEntryBoxData(void);
 static struct EntryBoxData * GetFirstEmptyPokedexEntryBox(void);
 static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index);
+static void CreatePokedexList(void);
 
 // UI functions
 static void MainCB2_Pokedex(void)
@@ -387,11 +397,6 @@ void CB2_OpenPokedexCustom(void)
             gMain.state++;
             break;
         case 7:
-            // BlendPalettes(PALETTES_ALL, 16, 0);
-            // BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
-            gMain.state++;
-            break;
-        case 8:
             m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x80);
             SetVBlankCallback(VBlankCB_Pokedex);
             CreateTask(Task_OpenPokedex, 0);
@@ -402,6 +407,7 @@ void CB2_OpenPokedexCustom(void)
 
 static void Task_OpenPokedex(u8 taskId)
 {
+    CreatePokedexList();
     InitPokedexEntryBoxData();
     LoadPokedexMainPageGfx();
     if (!gPaletteFade.active)
@@ -415,7 +421,7 @@ static void Task_PokedexScrollUp(u8 taskId)
     for (i = 0; i < MAX_ENTRY_BOXES; ++i)
     {
         box = &sPokedexViewData.entryBoxes[i];
-        if (box->species == SPECIES_NONE)
+        if (box->dexIndex == NATIONAL_DEX_COUNT)
             continue;
         gSprites[box->leftSpriteId].y2 += 4;
         if (box->index < BOX_CENTER)
@@ -438,7 +444,7 @@ static void Task_PokedexScrollDown(u8 taskId)
     for (i = 0; i < MAX_ENTRY_BOXES; ++i)
     {
         box = &sPokedexViewData.entryBoxes[i];
-        if (box->species == SPECIES_NONE)
+        if (box->dexIndex == NATIONAL_DEX_COUNT)
             continue;
         gSprites[box->leftSpriteId].y2 -= 4;
         if (box->index <= BOX_CENTER)
@@ -485,31 +491,39 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         }
     }
 
+    // Create or update the top hidden entry box.
     box = GetPokedexEntryBoxByIndex(BOX_0);
     if (box == NULL)
     {
         box = GetFirstEmptyPokedexEntryBox();
         box->index = BOX_0;
-        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_0 + 1)->species - 1);
+        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_0 + 1)->dexIndex - 1);
     }
-    else if (box->species >= SPECIES_BULBASAUR + MAX_ENTRY_BOXES)
+    else if (box->dexIndex >= 0 + MAX_ENTRY_BOXES)
     {
-        box->species -= MAX_ENTRY_BOXES;
+        box->dexIndex -= MAX_ENTRY_BOXES;
         DestroyPokedexEntryBox(box);
-        CreatePokedexEntryBox(box, box->species);
+        CreatePokedexEntryBox(box, box->dexIndex);
     }
-    else
+    else // Or destroy it if there's nothing left in the list.
     {
         DestroyPokedexEntryBox(box);
+        box->dexIndex = NATIONAL_DEX_COUNT;
         box->species = SPECIES_NONE;
         box->index = 0xFF;
         box->leftSpriteId = 0xFF;
     }
 
+    // Continue scrolling until the next seen species.
     if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+    {
         gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    }
     else
+    {
+        PlaySE(SE_DEX_SCROLL);
         gTasks[taskId].func = Task_PokedexScrollUp;
+    }
 }
 
 static void Task_PokedexFinishScrollDown(u8 taskId)
@@ -543,41 +557,51 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         }
     }
 
+    // Create or update the bottom hidden entry box.
     box = GetPokedexEntryBoxByIndex(BOX_HIDDEN);
     if (box == NULL)
     {
         box = GetFirstEmptyPokedexEntryBox();
         box->index = BOX_HIDDEN;
-        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_HIDDEN-1)->species + 1);
+        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_HIDDEN-1)->dexIndex + 1);
     }
-    else if (box->species <= SPECIES_NIDORAN_F - MAX_ENTRY_BOXES)
+    else if (box->dexIndex < sPokedexViewData.pokedexListCount - MAX_ENTRY_BOXES)
     {
-        box->species += MAX_ENTRY_BOXES;
+        box->dexIndex += MAX_ENTRY_BOXES;
         DestroyPokedexEntryBox(box);
-        CreatePokedexEntryBox(box, box->species);
+        CreatePokedexEntryBox(box, box->dexIndex);
     }
-    else
+    else // Or destroy it if there is nothing left in the list.
     {
         DestroyPokedexEntryBox(box);
         box->species = SPECIES_NONE;
+        box->dexIndex = NATIONAL_DEX_COUNT;
         box->index = 0xFF;
         box->leftSpriteId = 0xFF;
     }
 
+    // Continue scrolling until the next seen species.
     if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+    {
         gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    }
     else
+    {
+        PlaySE(SE_DEX_SCROLL);
         gTasks[taskId].func = Task_PokedexScrollDown;
+    }
 }
 
 static void Task_PokedexWaitForKeypress(u8 taskId)
 {
-    if (gMain.heldKeys & DPAD_UP && sPokedexViewData.selectedSpecies != SPECIES_BULBASAUR)
+    if (gMain.heldKeys & DPAD_UP && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex > 0)
     {
+        PlaySE(SE_DEX_SCROLL);
         gTasks[taskId].func = Task_PokedexScrollUp;
     }
-    if (gMain.heldKeys & DPAD_DOWN && sPokedexViewData.selectedSpecies != SPECIES_NIDORAN_F)
+    if (gMain.heldKeys & DPAD_DOWN && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex < sPokedexViewData.pokedexListCount - 1)
     {
+        PlaySE(SE_DEX_SCROLL);
         gTasks[taskId].func = Task_PokedexScrollDown;        
     }
     if (gMain.newKeys & B_BUTTON)
@@ -620,10 +644,10 @@ static void LoadPokedexMainPageGfx(void)
     sPokedexViewData.entryBoxes[4].index = 4;
     sPokedexViewData.entryBoxes[5].index = 5;
 
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], SPECIES_BULBASAUR);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], SPECIES_BULBASAUR + 1);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], SPECIES_BULBASAUR + 2);
-    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], SPECIES_BULBASAUR + 3);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[2], 0);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[3], 1);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[4], 2);
+    CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], 3);
 
     CreateSelectedMonFrontSprite(GetPokedexEntryBoxByIndex(BOX_CENTER)->species);
     gSprites[GetPokedexEntryBoxByIndex(BOX_CENTER)->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
@@ -700,9 +724,10 @@ static void SpriteCB_EntryBoxRight(struct Sprite *sprite)
     sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
 }
 
-static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species)
+static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 dexIndex)
 {
-    box->species = species;
+    box->dexIndex = dexIndex;
+    box->species = NationalPokedexNumToSpecies(sPokedexViewData.pokedexList[dexIndex].dexNum);
 
     LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntryBoxes[box->arrIndex]);
     box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->arrIndex], sEntryBoxPositions[box->index][0], sEntryBoxPositions[box->index][1], 16);
@@ -746,7 +771,7 @@ static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box)
     const u8 *speciesName;
 
     // Set up text.
-    if (!GetSetPokedexFlag(box->species, FLAG_GET_SEEN))
+    if (!sPokedexViewData.pokedexList[box->dexIndex].seen)
     {
         StringCopy(gStringVar3, COMPOUND_STRING("----"));
         StringCopy(gStringVar4, COMPOUND_STRING("------"));
@@ -846,7 +871,7 @@ static void SpriteCB_MonIconDex(struct Sprite *sprite)
 
 static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
 {
-    if (GetSetPokedexFlag(box->species, FLAG_GET_SEEN))
+    if (sPokedexViewData.pokedexList[box->dexIndex].seen)
     {
         LoadMonIconPalette(box->species);
         box->iconSpriteId = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(box->species), SpriteCB_MonIconDex, 0, 0, 0);
@@ -854,6 +879,9 @@ static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
         gSprites[box->iconSpriteId].sLeftSpriteId = box->leftSpriteId;
     }
 }
+
+#undef sLeftSpriteId
+#undef sDigitId
 
 static void InitPokedexEntryBoxData(void)
 {
@@ -864,6 +892,7 @@ static void InitPokedexEntryBoxData(void)
         box = &sPokedexViewData.entryBoxes[i];
         box->arrIndex = i;
         box->index = 0xFF;
+        box->dexIndex = NATIONAL_DEX_COUNT;
         box->species = SPECIES_NONE;
         box->leftSpriteId = SPRITE_NONE;
         box->middleSpriteId = SPRITE_NONE;
@@ -880,7 +909,6 @@ static struct EntryBoxData * GetFirstEmptyPokedexEntryBox(void)
     u32 i;
     for (i = 0; i < MAX_ENTRY_BOXES; ++i)
     {
-        DebugPrintf("box %d: %d", i, sPokedexViewData.entryBoxes[i].index);
         if (sPokedexViewData.entryBoxes[i].index == 0xFF)
             return &sPokedexViewData.entryBoxes[i];
     }
@@ -898,5 +926,25 @@ static struct EntryBoxData * GetPokedexEntryBoxByIndex(u32 index)
     return NULL;
 }
 
-#undef sLeftSpriteId
-#undef sDigitId
+static void CreatePokedexList(void)
+{
+    u32 i, dexNum, start = 0;
+    for (i = 0; i < NATIONAL_DEX_COUNT; ++i)
+    {
+        dexNum = i + 1;
+        if (GetSetPokedexFlag(i, FLAG_GET_SEEN))
+        {
+            start = i - 1;
+            break;
+        }
+    }
+    for (i = start; i < NATIONAL_DEX_COUNT; ++i)
+    {
+        dexNum = i + 1;
+        sPokedexViewData.pokedexList[i - start].dexNum = dexNum; 
+        sPokedexViewData.pokedexList[i - start].seen = GetSetPokedexFlag(dexNum, FLAG_GET_SEEN);
+        sPokedexViewData.pokedexList[i - start].owned = GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT);
+        if (sPokedexViewData.pokedexList[i - start].seen)
+            sPokedexViewData.pokedexListCount = dexNum - start;
+    }
+}
