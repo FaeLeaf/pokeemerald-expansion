@@ -315,11 +315,12 @@ static void Task_PokedexScrollDown(u8 taskId);
 static void Task_PokedexFinishScrollUp(u8 taskId);
 static void Task_PokedexFinishScrollDown(u8 taskId);
 static void Task_PokedexWaitForKeypress(u8 taskId);
+static void Task_UpdateSelectedMonFrontSprite(u8 taskId);
+static void Task_UpdateSelectedMonFrontSprite_Finish(u8 taskId);
 static void LoadPokedexMainPageGfx(void);
 static void PrintSeenOwnCount(void);
 static void CreatePokedexWindows(void);
 static void CreateSelectedMonFrontSprite(u32 species);
-static void UpdateSelectedMonFrontSprite(u32 species);
 static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species);
 static void DestroyPokedexEntryBox(struct EntryBoxData *box);
 static void PrintNameOntoPokedexEntryBox(struct EntryBoxData *box);
@@ -415,6 +416,7 @@ static void Task_OpenPokedex(u8 taskId)
 }
 
 #define tConsecutiveScrolls data[0]
+#define tFrameCount         data[0] // for update front pic task
 
 static void Task_PokedexScrollUp(u8 taskId)
 {
@@ -499,7 +501,8 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         if (box->index == BOX_CENTER)
         {
             gSprites[box->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
-            UpdateSelectedMonFrontSprite(box->species);
+            CreateTask(Task_UpdateSelectedMonFrontSprite, 1);
+            sPokedexViewData.selectedSpecies = box->species;
         }
         else
         {
@@ -575,7 +578,8 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         if (box->index == BOX_CENTER)
         {
             gSprites[box->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
-            UpdateSelectedMonFrontSprite(box->species);
+            CreateTask(Task_UpdateSelectedMonFrontSprite, 1);
+            sPokedexViewData.selectedSpecies = box->species;
         }
         else
         {
@@ -628,8 +632,6 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
     }
 }
 
-#undef tConsecutiveScrolls
-
 static void Task_PokedexWaitForKeypress(u8 taskId)
 {
     if (gMain.heldKeys & DPAD_UP && GetPokedexEntryBoxByIndex(BOX_CENTER)->dexIndex > 0)
@@ -668,6 +670,32 @@ static void Task_ClosePokedex(u8 taskId)
     SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
     m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
 }
+
+// Update the front sprite by destroying and creating the new one on the following frame.
+static void Task_UpdateSelectedMonFrontSprite(u8 taskId)
+{
+    if (gTasks[taskId].tFrameCount == 0)
+    {
+        FreeAndDestroyMonPicSprite(sPokedexViewData.selectedMonSpriteId);
+        ++gTasks[taskId].tFrameCount;
+    }
+    else
+    {
+        gTasks[taskId].func = Task_UpdateSelectedMonFrontSprite_Finish;
+    }
+}
+
+static void Task_UpdateSelectedMonFrontSprite_Finish(u8 taskId)
+{
+    if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(sPokedexViewData.selectedSpecies, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+    else
+        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
+    DestroyTask(taskId);
+}
+
+#undef tConsecutiveScrolls
+#undef tFrameCount
 
 static void LoadPokedexMainPageGfx(void)
 {
@@ -728,16 +756,6 @@ static void CreateSelectedMonFrontSprite(u32 species)
         sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
 }
 
-static void UpdateSelectedMonFrontSprite(u32 species)
-{
-    sPokedexViewData.selectedSpecies = species;
-    FreeAndDestroyMonPicSprite(sPokedexViewData.selectedMonSpriteId); // sprite sometimes destroyed frame after palette
-    if (GetSetPokedexFlag(species, FLAG_GET_SEEN))
-        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(species, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
-    else
-        sPokedexViewData.selectedMonSpriteId = CreateMonPicSprite(SPECIES_NONE, FALSE, 0xFE, TRUE, 34, 40, 15, TAG_NONE);
-}
-
 #define sLeftSpriteId   data[0] // for middle, right, icon, number, and ball sprites
 #define sDigitId        data[1] // for numbers
 
@@ -767,6 +785,7 @@ static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 dexIndex)
     box->dexIndex = dexIndex;
     box->species = NationalPokedexNumToSpecies(sPokedexViewData.pokedexList[dexIndex].dexNum);
 
+    FreeSpriteTilesByTag(TAG_POKEDEX_ENTRY + box->arrIndex);
     LoadCompressedSpriteSheet(&sSpriteSheet_PokedexEntryBoxes[box->arrIndex]);
     box->leftSpriteId = CreateSprite(&sPokedexEntrySpriteTemplates[box->arrIndex], sEntryBoxPositions[box->index][0], sEntryBoxPositions[box->index][1], 16);
 
@@ -791,7 +810,6 @@ static void DestroyPokedexEntryBox(struct EntryBoxData *box)
     DestroySprite(&gSprites[box->numberSpriteIds[0]]);
     DestroySprite(&gSprites[box->numberSpriteIds[1]]);
     DestroySprite(&gSprites[box->numberSpriteIds[2]]);
-    FreeSpriteTiles(&gSprites[box->leftSpriteId]);
     DestroySprite(&gSprites[box->leftSpriteId]);
     DestroySprite(&gSprites[box->middleSpriteId]);
     DestroySprite(&gSprites[box->rightSpriteId]);
