@@ -29,6 +29,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokedex.h"
+#include "pokedex_custom.h"
 #include "pokenav.h"
 #include "safari_zone.h"
 #include "save.h"
@@ -677,7 +678,7 @@ bool8 StartMenuPokedexCallback(void)
         PlayRainStoppingSoundEffect();
         RemoveExtraStartMenuWindows();
         CleanupOverworldWindowsAndTilemaps();
-        SetMainCallback2(CB2_OpenPokedex);
+        SetMainCallback2(CB2_OpenPokedexCustom);
 
         return TRUE;
     }
