@@ -198,7 +198,7 @@ static const struct OamData sOamData_64x32 =
     .x = 0,
     .y = 0,
     .affineMode = ST_OAM_AFFINE_OFF,
-    .objMode = ST_OAM_OBJ_NORMAL,
+    .objMode = ST_OAM_OBJ_BLEND,
     .mosaic = FALSE,
     .bpp = ST_OAM_4BPP,
     .shape = SPRITE_SHAPE(64x32),
@@ -475,7 +475,14 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
 
         // Update front pic.
         if (box->index == BOX_CENTER)
+        {
+            gSprites[box->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
             UpdateSelectedMonFrontSprite(box->species);
+        }
+        else
+        {
+            gSprites[box->leftSpriteId].oam.objMode = ST_OAM_OBJ_BLEND;
+        }
     }
 
     box = GetPokedexEntryBoxByIndex(BOX_0);
@@ -499,7 +506,10 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         box->leftSpriteId = 0xFF;
     }
 
-    gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+        gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    else
+        gTasks[taskId].func = Task_PokedexScrollUp;
 }
 
 static void Task_PokedexFinishScrollDown(u8 taskId)
@@ -523,7 +533,14 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
 
         // Update front pic.
         if (box->index == BOX_CENTER)
+        {
+            gSprites[box->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
             UpdateSelectedMonFrontSprite(box->species);
+        }
+        else
+        {
+            gSprites[box->leftSpriteId].oam.objMode = ST_OAM_OBJ_BLEND;
+        }
     }
 
     box = GetPokedexEntryBoxByIndex(BOX_HIDDEN);
@@ -547,7 +564,10 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         box->leftSpriteId = 0xFF;
     }
 
-    gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    if (GetSetPokedexFlag(sPokedexViewData.selectedSpecies, FLAG_GET_SEEN))
+        gTasks[taskId].func = Task_PokedexWaitForKeypress;
+    else
+        gTasks[taskId].func = Task_PokedexScrollDown;
 }
 
 static void Task_PokedexWaitForKeypress(u8 taskId)
@@ -592,6 +612,9 @@ static void LoadPokedexMainPageGfx(void)
     LoadSpritePalette(&sSpritePalette_PokedexEntry);
     LoadSpriteSheet(&sSpriteSheet_Number);
 
+    SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT2_ALL);
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(8, 10));
+
     sPokedexViewData.entryBoxes[2].index = 2;
     sPokedexViewData.entryBoxes[3].index = 3;
     sPokedexViewData.entryBoxes[4].index = 4;
@@ -603,6 +626,7 @@ static void LoadPokedexMainPageGfx(void)
     CreatePokedexEntryBox(&sPokedexViewData.entryBoxes[5], SPECIES_BULBASAUR + 3);
 
     CreateSelectedMonFrontSprite(GetPokedexEntryBoxByIndex(BOX_CENTER)->species);
+    gSprites[GetPokedexEntryBoxByIndex(BOX_CENTER)->leftSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
     CreatePokedexWindows();
     PrintSeenOwnCount();
 }
@@ -664,6 +688,7 @@ static void SpriteCB_EntryBoxMiddle(struct Sprite *sprite)
     sprite->y = gSprites[sprite->sLeftSpriteId].y;
     sprite->x2 = gSprites[sprite->sLeftSpriteId].x2;
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
+    sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
 }
 
 static void SpriteCB_EntryBoxRight(struct Sprite *sprite)
@@ -672,6 +697,7 @@ static void SpriteCB_EntryBoxRight(struct Sprite *sprite)
     sprite->y = gSprites[sprite->sLeftSpriteId].y;
     sprite->x2 = gSprites[sprite->sLeftSpriteId].x2;
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
+    sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
 }
 
 static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 species)
@@ -769,6 +795,7 @@ static void SpriteCB_EntryNumber(struct Sprite* sprite)
     sprite->y = gSprites[sprite->sLeftSpriteId].y - 8;
     sprite->x2 = gSprites[sprite->sLeftSpriteId].x2;
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
+    sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
 }
 
 static void PrintNumberOntoPokedexEntryBox(struct EntryBoxData *box)
@@ -814,6 +841,7 @@ static void SpriteCB_MonIconDex(struct Sprite *sprite)
     sprite->y = gSprites[sprite->sLeftSpriteId].y - 1;
     sprite->x2 = gSprites[sprite->sLeftSpriteId].x2;
     sprite->y2 = gSprites[sprite->sLeftSpriteId].y2;
+    sprite->oam.objMode = gSprites[sprite->sLeftSpriteId].oam.objMode;
 }
 
 static void CreateMonIconOnPokedexEntryBox(struct EntryBoxData *box)
