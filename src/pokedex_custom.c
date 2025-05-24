@@ -547,31 +547,31 @@ static void Task_PokedexFinishScrollUp(u8 taskId)
         }
     }
 
-    if (sPokedexViewData.pokedexListCount > 4)
+    // Create or update the bottom hidden entry box, if there are enough species seen.
+    if (sPokedexViewData.pokedexListCount > 3)
     {
-    // Create or update the top hidden entry box.
-    box = GetPokedexEntryBoxByIndex(BOX_0);
-    if (box == NULL)
-    {
-        box = GetFirstEmptyPokedexEntryBox();
-        box->index = BOX_0;
-        CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_0 + 1)->dexIndex - 1);
+        box = GetPokedexEntryBoxByIndex(BOX_0);
+        if (box == NULL)
+        {
+            box = GetFirstEmptyPokedexEntryBox();
+            box->index = BOX_0;
+            CreatePokedexEntryBox(box, GetPokedexEntryBoxByIndex(BOX_0 + 1)->dexIndex - 1);
+        }
+        else if (box->dexIndex >= 0 + MAX_ENTRY_BOXES)
+        {
+            DestroyPokedexEntryBox(box);
+            box->dexIndex -= MAX_ENTRY_BOXES;
+            CreatePokedexEntryBox(box, box->dexIndex);
+        }
+        else // Or destroy it if there's nothing left in the list.
+        {
+            DestroyPokedexEntryBox(box);
+            box->dexIndex = NATIONAL_DEX_COUNT;
+            box->species = SPECIES_NONE;
+            box->index = 0xFF;
+            box->leftSpriteId = 0xFF;
+        }
     }
-    else if (box->dexIndex >= 0 + MAX_ENTRY_BOXES)
-    {
-        box->dexIndex -= MAX_ENTRY_BOXES;
-        DestroyPokedexEntryBox(box);
-        CreatePokedexEntryBox(box, box->dexIndex);
-    }
-    else // Or destroy it if there's nothing left in the list.
-    {
-        DestroyPokedexEntryBox(box);
-        box->dexIndex = NATIONAL_DEX_COUNT;
-        box->species = SPECIES_NONE;
-        box->index = 0xFF;
-        box->leftSpriteId = 0xFF;
-    }
-}
 
     // Allow exit or continue scrolling until the next seen species.
     if (gMain.heldKeys & B_BUTTON)
@@ -639,8 +639,8 @@ static void Task_PokedexFinishScrollDown(u8 taskId)
         }
         else if (box->dexIndex + MAX_ENTRY_BOXES < sPokedexViewData.pokedexListCount)
         {
-            box->dexIndex += MAX_ENTRY_BOXES;
             DestroyPokedexEntryBox(box);
+            box->dexIndex += MAX_ENTRY_BOXES;
             CreatePokedexEntryBox(box, box->dexIndex);
         }
         else // Or destroy it if there is nothing left in the list.
@@ -848,14 +848,16 @@ static void CreatePokedexEntryBox(struct EntryBoxData *box, u32 dexIndex)
 
 static void DestroyPokedexEntryBox(struct EntryBoxData *box)
 {
-    FreeAndDestroyMonIconSprite(&gSprites[box->iconSpriteId]);
     DestroySprite(&gSprites[box->numberSpriteIds[0]]);
     DestroySprite(&gSprites[box->numberSpriteIds[1]]);
     DestroySprite(&gSprites[box->numberSpriteIds[2]]);
     DestroySprite(&gSprites[box->leftSpriteId]);
     DestroySprite(&gSprites[box->middleSpriteId]);
     DestroySprite(&gSprites[box->rightSpriteId]);
-    DestroySprite(&gSprites[box->ballSpriteId]);
+    if (sPokedexViewData.pokedexList[box->dexIndex].seen)
+        FreeAndDestroyMonIconSprite(&gSprites[box->iconSpriteId]);
+    if (sPokedexViewData.pokedexList[box->dexIndex].owned)
+        DestroySprite(&gSprites[box->ballSpriteId]);
 }
 
 static const u8 sTextColor_Name[] = {2, 1, 0}; // black bg, white text
@@ -1018,6 +1020,7 @@ static void InitPokedexEntryBoxData(void)
         box->numberSpriteIds[0] = SPRITE_NONE;
         box->numberSpriteIds[1] = SPRITE_NONE;
         box->numberSpriteIds[2] = SPRITE_NONE;
+        box->ballSpriteId = SPRITE_NONE;
     }
 }
 
