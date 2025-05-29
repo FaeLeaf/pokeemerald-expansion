@@ -1640,9 +1640,28 @@
 // Camborea
 #define SPECIES_ALLILEAF                                1524
 #define SPECIES_CROCOFROND                              1525
-#define SPECIES_GRASS_FINAL                             1526
+#define SPECIES_DRACODILE                               1526
 #define SPECIES_LAVASAUR                                1527
-#define SPECIES_EGG                                     (SPECIES_LAVASAUR + 1)
+#define SPECIES_BRONTOSEAR                              1528
+#define SPECIES_VOLBRACHIO                              1529
+#define SPECIES_SHARQUA                                 1530
+#define SPECIES_THRESHARP                               1531
+#define SPECIES_SLASHARK                                1532
+#define SPECIES_CAPPI                                   1533
+#define SPECIES_11                                      1534
+#define SPECIES_PEBBIRD                                 1535
+#define SPECIES_13                                      1536
+#define SPECIES_14                                      1537
+#define SPECIES_GRUBBUG_SPRING                          1538
+#define SPECIES_GRUBBUG_SUMMER                          1539
+#define SPECIES_GRUBBUG_AUTUMN                          1540
+#define SPECIES_GRUBBUG_WINTER                          1541
+#define SPECIES_16                                      1542
+#define SPECIES_17                                      1543
+#define SPECIES_18                                      1544
+#define SPECIES_19                                      1545
+#define SPECIES_LUNOX                                   1546
+#define SPECIES_EGG                                     (SPECIES_LUNOX + 1)
 
 #define NUM_SPECIES SPECIES_EGG
 
