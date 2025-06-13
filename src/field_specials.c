@@ -15,6 +15,7 @@
 #include "field_message_box.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_seasons.h"
 #include "field_specials.h"
 #include "field_weather.h"
 #include "graphics.h"
@@ -984,7 +985,7 @@ void FieldShowRegionMap(void)
 
 static bool32 IsBuildingPCTile(u32 tileId)
 {
-    return gMapHeader.mapLayout->primaryTileset == &gTileset_Building && (tileId == METATILE_Building_PC_On || tileId == METATILE_Building_PC_Off);
+    return GetMapLayoutPrimaryTileset(gMapHeader.mapLayout) == &gTileset_Building && (tileId == METATILE_Building_PC_On || tileId == METATILE_Building_PC_Off);
 }
 
 static bool32 IsPlayerHousePCTile(u32 tileId)

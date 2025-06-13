@@ -47,6 +47,8 @@ struct Tileset
     /*0x0C*/ const u16 *metatiles;
     /*0x10*/ const u16 *metatileAttributes;
     /*0x14*/ TilesetCB callback;
+    /*0x??*/ const struct Tileset *seasons[4];
+    /*0x??*/ const struct Tileset * const *transitionAnim; // array of Tileset pointers, ending with NULL
 };
 
 struct MapLayout

@@ -18,6 +18,7 @@
 #include "field_message_box.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_seasons.h"
 #include "field_special_scene.h"
 #include "field_specials.h"
 #include "field_tasks.h"
@@ -1643,7 +1644,7 @@ bool32 CurrentMapHasShadows(void)
 // Update & mix day / night bg palettes (into unfaded)
 void UpdateAltBgPalettes(u16 palettes)
 {
-    const struct Tileset *primary = gMapHeader.mapLayout->primaryTileset;
+    const struct Tileset *primary = GetMapLayoutPrimaryTileset(gMapHeader.mapLayout);
     const struct Tileset *secondary = gMapHeader.mapLayout->secondaryTileset;
     u32 i = 1;
     if (!MapHasNaturalLight(gMapHeader.mapType))

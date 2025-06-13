@@ -3,6 +3,7 @@
 #include "bike.h"
 #include "field_camera.h"
 #include "field_player_avatar.h"
+#include "field_seasons.h"
 #include "fieldmap.h"
 #include "event_object_movement.h"
 #include "gpu_regs.h"
@@ -83,6 +84,12 @@ void FieldUpdateBgTilemapScroll(void)
     SetGpuReg(REG_OFFSET_BG2VOFS, r4);
     SetGpuReg(REG_OFFSET_BG3HOFS, r5);
     SetGpuReg(REG_OFFSET_BG3VOFS, r4);
+}
+
+void GetCameraTileOffset(u8 *x, u8 *y)
+{
+    *x = sFieldCameraOffset.xTileOffset;
+    *y = sFieldCameraOffset.yTileOffset;
 }
 
 void GetCameraOffsetWithPan(s16 *x, s16 *y)
@@ -232,7 +239,7 @@ static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x,
         metatileId = 0;
     if (metatileId < NUM_METATILES_IN_PRIMARY)
     {
-        metatiles = mapLayout->primaryTileset->metatiles;
+        metatiles = GetMapLayoutPrimaryTileset(mapLayout)->metatiles;
     }
     else
     {

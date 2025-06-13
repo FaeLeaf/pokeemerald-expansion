@@ -832,15 +832,174 @@ const struct Tileset gTileset_UnionRoom =
 };
 
 // Custom
-const struct Tileset gTileset_Overworld =
+const struct Tileset gTileset_OverworldSummerToAutumn =
 {
-    .isCompressed = TRUE,
+    .isCompressed = FALSE,
     .isSecondary = FALSE,
-    .tiles = gTilesetTiles_Overworld,
-    .palettes = gTilesetPalettes_Overworld,
-    .metatiles = gMetatiles_Overworld,
-    .metatileAttributes = gMetatileAttributes_Overworld,
+    .tiles = gTilesetTiles_OverworldSummerToAutumn,
+    .palettes = gTilesetPalettes_OverworldSummerToAutumn,
+    .metatiles = gMetatiles_OverworldSummerToAutumn,
+    .metatileAttributes = gMetatileAttributes_OverworldSummerToAutumn,
     .callback = NULL,
+};
+
+const struct Tileset gTileset_OverworldSummerToAutumn2 =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldSummerToAutumn2,
+    .palettes = gTilesetPalettes_OverworldSummerToAutumn2,
+    .metatiles = gMetatiles_OverworldSummerToAutumn2,
+    .metatileAttributes = gMetatileAttributes_OverworldSummerToAutumn2,
+    .callback = NULL,
+};
+
+const struct Tileset * const gTilesetTransition_OverworldAutumn[] =
+{
+    &gTileset_OverworldSummerToAutumn,
+    &gTileset_OverworldSummerToAutumn2,
+    NULL,
+};
+
+const struct Tileset gTileset_OverworldAutumn =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldAutumn,
+    .palettes = gTilesetPalettes_OverworldAutumn,
+    .metatiles = gMetatiles_OverworldAutumn,
+    .metatileAttributes = gMetatileAttributes_OverworldAutumn,
+    .callback = NULL,
+    .transitionAnim = gTilesetTransition_OverworldAutumn,
+};
+
+const struct Tileset gTileset_OverworldAutumnToWinter =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldAutumnToWinter,
+    .palettes = gTilesetPalettes_OverworldAutumnToWinter,
+    .metatiles = gMetatiles_OverworldAutumnToWinter,
+    .metatileAttributes = gMetatileAttributes_OverworldAutumnToWinter,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_OverworldAutumnToWinter2 =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldAutumnToWinter2,
+    .palettes = gTilesetPalettes_OverworldAutumnToWinter2,
+    .metatiles = gMetatiles_OverworldAutumnToWinter2,
+    .metatileAttributes = gMetatileAttributes_OverworldAutumnToWinter2,
+    .callback = NULL,
+};
+
+const struct Tileset * const gTilesetTransition_OverworldWinter[] =
+{
+    &gTileset_OverworldAutumnToWinter,
+    &gTileset_OverworldAutumnToWinter2,
+    NULL,
+};
+
+const struct Tileset gTileset_OverworldWinter =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldWinter,
+    .palettes = gTilesetPalettes_OverworldWinter,
+    .metatiles = gMetatiles_OverworldWinter,
+    .metatileAttributes = gMetatileAttributes_OverworldWinter,
+    .callback = NULL,
+    .transitionAnim = gTilesetTransition_OverworldWinter,
+};
+
+const struct Tileset gTileset_OverworldWinterToSpring =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldWinterToSpring,
+    .palettes = gTilesetPalettes_OverworldWinterToSpring,
+    .metatiles = gMetatiles_OverworldWinterToSpring,
+    .metatileAttributes = gMetatileAttributes_OverworldWinterToSpring,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_OverworldWinterToSpring2 =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldWinterToSpring2,
+    .palettes = gTilesetPalettes_OverworldWinterToSpring2,
+    .metatiles = gMetatiles_OverworldWinterToSpring2,
+    .metatileAttributes = gMetatileAttributes_OverworldWinterToSpring2,
+    .callback = NULL,
+};
+
+const struct Tileset * const gTilesetTransition_OverworldSpring[] =
+{
+    &gTileset_OverworldWinterToSpring,
+    &gTileset_OverworldWinterToSpring2,
+    NULL,
+};
+
+const struct Tileset gTileset_OverworldSpring =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldSpring,
+    .palettes = gTilesetPalettes_OverworldSpring,
+    .metatiles = gMetatiles_OverworldSpring,
+    .metatileAttributes = gMetatileAttributes_OverworldSpring,
+    .callback = NULL,
+    .transitionAnim = gTilesetTransition_OverworldSpring,
+};
+
+const struct Tileset gTileset_OverworldSpringToSummer =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldSpringToSummer,
+    .palettes = gTilesetPalettes_OverworldSpringToSummer,
+    .metatiles = gMetatiles_OverworldSpringToSummer,
+    .metatileAttributes = gMetatileAttributes_OverworldSpringToSummer,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_OverworldSpringToSummer2 =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldSpringToSummer2,
+    .palettes = gTilesetPalettes_OverworldSpringToSummer2,
+    .metatiles = gMetatiles_OverworldSpringToSummer2,
+    .metatileAttributes = gMetatileAttributes_OverworldSpringToSummer2,
+    .callback = NULL,
+};
+
+const struct Tileset * const gTilesetTransition_OverworldSummer[] =
+{
+    &gTileset_OverworldSpringToSummer,
+    &gTileset_OverworldSpringToSummer2,
+    NULL,
+};
+
+const struct Tileset gTileset_OverworldSummer =
+{
+    .isCompressed = FALSE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_OverworldSummer,
+    .palettes = gTilesetPalettes_OverworldSummer,
+    .metatiles = gMetatiles_OverworldSummer,
+    .metatileAttributes = gMetatileAttributes_OverworldSummer,
+    .callback = NULL,
+    .seasons = {
+        [SEASON_SPRING] = &gTileset_OverworldSpring,
+        [SEASON_SUMMER] = NULL,
+        [SEASON_AUTUMN] = &gTileset_OverworldAutumn,
+        [SEASON_WINTER] = &gTileset_OverworldWinter,
+    },
+    .transitionAnim = gTilesetTransition_OverworldSummer,
 };
 
 const struct Tileset gTileset_Cherry =

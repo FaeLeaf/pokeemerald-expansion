@@ -209,8 +209,41 @@ const u16 gMetatiles_UnionRoom[] = INCBIN_U16("data/tilesets/secondary/union_roo
 const u16 gMetatileAttributes_UnionRoom[] = INCBIN_U16("data/tilesets/secondary/union_room/metatile_attributes.bin");
 
 // Custom
-const u16 gMetatiles_Overworld[] = INCBIN_U16("data/tilesets/primary/overworld/metatiles.bin");
-const u16 gMetatileAttributes_Overworld[] = INCBIN_U16("data/tilesets/primary/overworld/metatile_attributes.bin");
+const u16 gMetatiles_OverworldSummer[] = INCBIN_U16("data/tilesets/primary/overworld_summer/metatiles.bin");
+const u16 gMetatileAttributes_OverworldSummer[] = INCBIN_U16("data/tilesets/primary/overworld_summer/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldSummerToAutumn[] = INCBIN_U16("data/tilesets/primary/overworld_summer_to_autumn/metatiles.bin");
+const u16 gMetatileAttributes_OverworldSummerToAutumn[] = INCBIN_U16("data/tilesets/primary/overworld_summer_to_autumn/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldSummerToAutumn2[] = INCBIN_U16("data/tilesets/primary/overworld_summer_to_autumn2/metatiles.bin");
+const u16 gMetatileAttributes_OverworldSummerToAutumn2[] = INCBIN_U16("data/tilesets/primary/overworld_summer_to_autumn2/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldAutumn[] = INCBIN_U16("data/tilesets/primary/overworld_autumn/metatiles.bin");
+const u16 gMetatileAttributes_OverworldAutumn[] = INCBIN_U16("data/tilesets/primary/overworld_autumn/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldAutumnToWinter[] = INCBIN_U16("data/tilesets/primary/overworld_autumn_to_winter/metatiles.bin");
+const u16 gMetatileAttributes_OverworldAutumnToWinter[] = INCBIN_U16("data/tilesets/primary/overworld_autumn_to_winter/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldAutumnToWinter2[] = INCBIN_U16("data/tilesets/primary/overworld_autumn_to_winter2/metatiles.bin");
+const u16 gMetatileAttributes_OverworldAutumnToWinter2[] = INCBIN_U16("data/tilesets/primary/overworld_autumn_to_winter2/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldWinter[] = INCBIN_U16("data/tilesets/primary/overworld_winter/metatiles.bin");
+const u16 gMetatileAttributes_OverworldWinter[] = INCBIN_U16("data/tilesets/primary/overworld_winter/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldWinterToSpring[] = INCBIN_U16("data/tilesets/primary/overworld_winter_to_spring/metatiles.bin");
+const u16 gMetatileAttributes_OverworldWinterToSpring[] = INCBIN_U16("data/tilesets/primary/overworld_winter_to_spring/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldWinterToSpring2[] = INCBIN_U16("data/tilesets/primary/overworld_winter_to_spring2/metatiles.bin");
+const u16 gMetatileAttributes_OverworldWinterToSpring2[] = INCBIN_U16("data/tilesets/primary/overworld_winter_to_spring2/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldSpring[] = INCBIN_U16("data/tilesets/primary/overworld_spring/metatiles.bin");
+const u16 gMetatileAttributes_OverworldSpring[] = INCBIN_U16("data/tilesets/primary/overworld_spring/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldSpringToSummer[] = INCBIN_U16("data/tilesets/primary/overworld_spring_to_summer/metatiles.bin");
+const u16 gMetatileAttributes_OverworldSpringToSummer[] = INCBIN_U16("data/tilesets/primary/overworld_spring_to_summer/metatile_attributes.bin");
+
+const u16 gMetatiles_OverworldSpringToSummer2[] = INCBIN_U16("data/tilesets/primary/overworld_spring_to_summer2/metatiles.bin");
+const u16 gMetatileAttributes_OverworldSpringToSummer2[] = INCBIN_U16("data/tilesets/primary/overworld_spring_to_summer2/metatile_attributes.bin");
 
 const u16 gMetatiles_Cherry[] = INCBIN_U16("data/tilesets/secondary/cherry/metatiles.bin");
 const u16 gMetatileAttributes_Cherry[] = INCBIN_U16("data/tilesets/secondary/cherry/metatile_attributes.bin");

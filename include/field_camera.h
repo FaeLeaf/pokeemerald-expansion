@@ -17,6 +17,7 @@ extern u16 gTotalCameraPixelOffsetY;
 
 void DrawWholeMapView(void);
 void CurrentMapDrawMetatileAt(int x, int y);
+void GetCameraTileOffset(u8 *x, u8 *y);
 void GetCameraOffsetWithPan(s16 *x, s16 *y);
 void DrawDoorMetatileAt(int x, int y, u16 *arr);
 void ResetFieldCamera(void);

@@ -6,6 +6,7 @@
 #include "task.h"
 #include "battle_transition.h"
 #include "fieldmap.h"
+#include "field_seasons.h"
 
 static EWRAM_DATA struct {
     const u16 *src;
@@ -602,8 +603,8 @@ static void _InitPrimaryTilesetAnimation(void)
     sPrimaryTilesetAnimCounter = 0;
     sPrimaryTilesetAnimCounterMax = 0;
     sPrimaryTilesetAnimCallback = NULL;
-    if (gMapHeader.mapLayout->primaryTileset && gMapHeader.mapLayout->primaryTileset->callback)
-        gMapHeader.mapLayout->primaryTileset->callback();
+    if (GetMapLayoutPrimaryTileset(gMapHeader.mapLayout) && GetMapLayoutPrimaryTileset(gMapHeader.mapLayout)->callback)
+        GetMapLayoutPrimaryTileset(gMapHeader.mapLayout)->callback();
 }
 
 static void _InitSecondaryTilesetAnimation(void)

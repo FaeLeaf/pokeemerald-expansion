@@ -1,4 +1,5 @@
 #include "global.h"
+#include "field_seasons.h"
 #include "tilesets.h"
 #include "tileset_anims.h"
 
