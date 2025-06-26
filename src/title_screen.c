@@ -10,6 +10,7 @@
 #include "m4a.h"
 #include "main.h"
 #include "main_menu.h"
+#include "main_menu_custom.h"
 #include "palette.h"
 #include "reset_rtc_screen.h"
 #include "berry_fix_program.h"
@@ -824,7 +825,7 @@ static void Task_TitleScreenPhase3(u8 taskId)
 static void CB2_GoToMainMenu(void)
 {
     if (!UpdatePaletteFade())
-        SetMainCallback2(CB2_InitMainMenu);
+        SetMainCallback2(CB2_OpenMainMenuCustom);
 }
 
 static void CB2_GoToCopyrightScreen(void)

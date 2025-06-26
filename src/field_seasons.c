@@ -17,7 +17,6 @@
 EWRAM_DATA u16 *gTempOverworldTilemapBuffer_Bg1 = NULL;
 EWRAM_DATA u16 *gTempOverworldTilemapBuffer_Bg2 = NULL;
 EWRAM_DATA u16 *gTempOverworldTilemapBuffer_Bg3 = NULL;
-EWRAM_DATA u8 gCurrentSeason = 0;
 EWRAM_DATA static const struct Tileset *sPrimaryTilesetOverride = NULL;
 
 static void DrawMetatileInTempBuffer(s32 metatileLayerType, const u16 *tiles, u16 offset);
@@ -37,7 +36,7 @@ const struct Tileset *GetMapLayoutPrimaryTileset(struct MapLayout const *mapLayo
     if (sPrimaryTilesetOverride != NULL)
         return sPrimaryTilesetOverride;
     else
-        return GetTilesetSeasonalVariant(mapLayout->primaryTileset, gCurrentSeason);
+        return GetTilesetSeasonalVariant(mapLayout->primaryTileset, gSaveBlock3Ptr->currentSeason);
 }
 
 static void Task_ReloadTilesetAndMetatiles(u8 taskId)
@@ -86,7 +85,7 @@ static void Task_ReloadTilesetAndMetatiles(u8 taskId)
 
 static void Task_ExecuteSeasonTransition(u8 taskId)
 {
-    const struct Tileset *tileset = GetTilesetSeasonalVariant(gMapHeader.mapLayout->primaryTileset, gCurrentSeason);
+    const struct Tileset *tileset = GetTilesetSeasonalVariant(gMapHeader.mapLayout->primaryTileset, gSaveBlock3Ptr->currentSeason);
     switch (gTasks[taskId].tState)
     {
         // If no transition anim, just update the current tileset and end.
@@ -150,9 +149,9 @@ static const struct Tileset *GetTilesetSeasonalVariant(const struct Tileset *til
 
 void IncrementSeason(void)
 {
-    ++gCurrentSeason;
-    if (gCurrentSeason >= SEASONS_COUNT)
-        gCurrentSeason = SEASON_SPRING;
+    ++gSaveBlock3Ptr->currentSeason;
+    if (gSaveBlock3Ptr->currentSeason >= SEASONS_COUNT)
+        gSaveBlock3Ptr->currentSeason = SEASON_SPRING;
     CreateTask(Task_ExecuteSeasonTransition, 0);
 }
 
@@ -263,5 +262,26 @@ static void LoadMapViewToTempBuffer(void)
                 temp -= 32;
             DrawMetatileAtInTempBuffer(r6 + temp, gSaveBlock1Ptr->pos.x + j / 2, gSaveBlock1Ptr->pos.y + i / 2);
         }
+    }
+}
+
+static const u8 sText_Spring[] = _("SPRING");
+static const u8 sText_Summer[] = _("SUMMER");
+static const u8 sText_Autumn[] = _("AUTUMN");
+static const u8 sText_Winter[] = _("WINTER");
+
+const u8* GetSeasonName(u32 season)
+{
+    switch (season)
+    {
+        default:
+        case SEASON_SPRING:
+            return sText_Spring;
+        case SEASON_SUMMER:
+            return sText_Summer;
+        case SEASON_AUTUMN:
+            return sText_Autumn;
+        case SEASON_WINTER:
+            return sText_Winter;
     }
 }

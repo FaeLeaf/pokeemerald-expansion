@@ -10,5 +10,6 @@ enum {
 };
 
 const struct Tileset* GetMapLayoutPrimaryTileset(struct MapLayout const *mapLayout);
+const u8* GetSeasonName(u32 season);
 
 #endif //GUARD_FIELD_SEASONS_H
