@@ -3393,4 +3393,22 @@ extern const u32 gBattleIcons_Gfx2[];
 extern const u16 gBattleIcons_Pal1[];
 extern const u16 gBattleIcons_Pal2[];
 
+extern const u32 gBadge1Gfx[];
+extern const u32 gBadge2Gfx[];
+extern const u32 gBadge3Gfx[];
+extern const u32 gBadge4Gfx[];
+extern const u32 gBadge5Gfx[];
+extern const u32 gBadge6Gfx[];
+extern const u32 gBadge7Gfx[];
+extern const u32 gBadge8Gfx[];
+
+extern const u16 gBadge1Pal[];
+extern const u16 gBadge2Pal[];
+extern const u16 gBadge3Pal[];
+extern const u16 gBadge4Pal[];
+extern const u16 gBadge5Pal[];
+extern const u16 gBadge6Pal[];
+extern const u16 gBadge7Pal[];
+extern const u16 gBadge8Pal[];
+
 #endif //GUARD_GRAPHICS_H

@@ -2,16 +2,20 @@
 #include "battle_anim.h"
 #include "bg.h"
 #include "decompress.h"
+#include "event_data.h"
 #include "event_object_movement.h"
 #include "field_screen_effect.h"
 #include "field_seasons.h"
 #include "field_weather.h"
 #include "gpu_regs.h"
+#include "graphics.h"
 #include "m4a.h"
 #include "main.h"
+#include "main_menu_custom.h"
 #include "malloc.h"
 #include "menu.h"
 #include "overworld.h"
+#include "option_menu.h"
 #include "palette.h"
 #include "pokedex.h"
 #include "pokemon.h"
@@ -38,8 +42,20 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/species.h"
+#include "constants/flags.h"
 
 // constants
+enum
+{
+    TAG_BADGE_1 = 2000,
+    TAG_BADGE_2,
+    TAG_BADGE_3,
+    TAG_BADGE_4,
+    TAG_BADGE_5,
+    TAG_BADGE_6,
+    TAG_BADGE_7,
+    TAG_BADGE_8,
+};
 
 // structs
 
@@ -126,18 +142,136 @@ static const u32 sMainMenuContinueTilemap[] = INCBIN_U32("graphics/main_menu_cus
 static const u32 sMainMenuNewGameTilemap[] = INCBIN_U32("graphics/main_menu_custom/new_game_selected.bin.lz");
 static const u32 sMainMenuOptionsTilemap[] = INCBIN_U32("graphics/main_menu_custom/options_selected.bin.lz");
 
+static const struct OamData sOamData_Badge =
+{
+    .x = 0,
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(16x16),
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(16x16),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_Badges[] =
+{
+    {
+        .tileTag = TAG_BADGE_1,
+        .paletteTag = TAG_BADGE_1,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_2,
+        .paletteTag = TAG_BADGE_2,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_3,
+        .paletteTag = TAG_BADGE_3,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_4,
+        .paletteTag = TAG_BADGE_4,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_5,
+        .paletteTag = TAG_BADGE_5,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_6,
+        .paletteTag = TAG_BADGE_6,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_7,
+        .paletteTag = TAG_BADGE_7,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+    {
+        .tileTag = TAG_BADGE_8,
+        .paletteTag = TAG_BADGE_8,
+        .oam = &sOamData_Badge,
+        .anims = gDummySpriteAnimTable,
+        .images = NULL,
+        .affineAnims = gDummySpriteAffineAnimTable,
+        .callback = SpriteCallbackDummy,
+    },
+};
+
+static const struct CompressedSpriteSheet sSpriteSheet_Badges[] = 
+{
+    { gBadge1Gfx, 0x400, TAG_BADGE_1 },
+    { gBadge2Gfx, 0x400, TAG_BADGE_2 },
+    { gBadge3Gfx, 0x400, TAG_BADGE_3 },
+    { gBadge4Gfx, 0x400, TAG_BADGE_4 },
+    { gBadge5Gfx, 0x400, TAG_BADGE_5 },
+    { gBadge6Gfx, 0x400, TAG_BADGE_6 },
+    { gBadge7Gfx, 0x400, TAG_BADGE_7 },
+    { gBadge8Gfx, 0x400, TAG_BADGE_8 },
+};
+
+static const struct SpritePalette sSpritePalette_Badges[] = 
+{
+    { gBadge1Pal, TAG_BADGE_1 },
+    { gBadge2Pal, TAG_BADGE_2 },
+    { gBadge3Pal, TAG_BADGE_3 },
+    { gBadge4Pal, TAG_BADGE_4 },
+    { gBadge5Pal, TAG_BADGE_5 },
+    { gBadge6Pal, TAG_BADGE_6 },
+    { gBadge7Pal, TAG_BADGE_7 },
+    { gBadge8Pal, TAG_BADGE_8 },
+};
+
 // constant data
 #define SELECTED_CONTINUE   0
 #define SELECTED_NEW_GAME   1
 #define SELECTED_OPTIONS    2
 
 // ewram data
+EWRAM_DATA MainCallback sMainMenuExitCallback = NULL;
 EWRAM_DATA static u32 *sMainMenuTilemapPtr = NULL;
 EWRAM_DATA static u8 sMainMenuSelectedOption = 0;
 EWRAM_DATA static u8 sMainMenuLastSelectedOption = 0;
 EWRAM_DATA u32 sPlayerSpriteId = 0;
 EWRAM_DATA u32 sPartySpriteIds[PARTY_SIZE] = {0};
-EWRAM_DATA MainCallback sMainMenuExitCallback = NULL;
+EWRAM_DATA u32 sBadgeSpriteIds[NUM_BADGES] = {0};
 
 // forward declarations
 static void MainCB2_MainMenu(void);
@@ -154,6 +288,7 @@ static void PrintDexPlayTime(void);
 static void LoadMainMenuTilemap(u32 selectedId);
 static void DrawPlayerSprite(void);
 static void DrawPartyIcons(void);
+static void DrawBadges(void);
 static void ToggleGrayscaleAndAnims(void);
 
 // UI functions
@@ -267,7 +402,6 @@ static void Task_MainMenuWaitForKeypress(u8 taskId)
                 PlaySE(SE_SELECT);
                 BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
                 sMainMenuExitCallback = CB2_NewGame; // TODO: proper callback
-                StringCopy(gSaveBlock2Ptr->playerName, COMPOUND_STRING("AGUSTIN"));
                 gTasks[taskId].func = Task_CloseMainMenu;
             }
             if (gMain.newKeys & DPAD_UP)
@@ -289,7 +423,11 @@ static void Task_MainMenuWaitForKeypress(u8 taskId)
             if (gMain.newKeys & A_BUTTON)
             {
                 PlaySE(SE_SELECT);
-                // TODO: options functionality
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+                
+                gMain.savedCallback = CB2_OpenMainMenuCustom;
+                sMainMenuExitCallback = CB2_InitOptionMenu;
+                gTasks[taskId].func = Task_CloseMainMenu;
             }
             if (gMain.newKeys & DPAD_UP)
             {
@@ -346,8 +484,10 @@ static void LoadMainMenuGfx(void)
 
     DrawPlayerSprite();
     DrawPartyIcons();
-    // TODO: badges
+    DrawBadges();
     LoadMainMenuTilemap(sMainMenuSelectedOption);
+    if (sMainMenuSelectedOption != SELECTED_CONTINUE)
+        ToggleGrayscaleAndAnims();
 }
 
 static void CreateMainMenuWindows(void)
@@ -453,7 +593,25 @@ static void DrawPartyIcons(void)
         {
             LoadMonIconPalette(species);
             sPartySpriteIds[i] = CreateMonIconNoPersonality(GetIconSpeciesNoPersonality(species),
-                                    SpriteCB_MonIcon, 186 + 20*(i%2), 38 + 20*(i/2), 0);
+                                    SpriteCB_MonIcon, 190 + 20*(i%2), 32 + 22*(i/2), 0);
+        }
+    }
+}
+
+static void DrawBadges(void)
+{
+    u32 i;
+    for (i = 0; i < NUM_BADGES; ++i)
+    {
+        if (FlagGet(FLAG_BADGE01_GET + i))
+        {
+            LoadCompressedSpriteSheet(&sSpriteSheet_Badges[i]);
+            LoadSpritePalette(&sSpritePalette_Badges[i]);
+            sBadgeSpriteIds[i] = CreateSprite(&sSpriteTemplate_Badges[i], 25 + 27*i, 106, 0);
+        }
+        else
+        {
+            sBadgeSpriteIds[i] = 0xFF;
         }
     }
 }
@@ -470,6 +628,10 @@ static void ToggleGrayscaleAndAnims(void)
             gSprites[sPartySpriteIds[i]].callback = SpriteCB_MonIcon;
             SetGrayscaleOrOriginalPalette(16 + gSprites[sPartySpriteIds[i]].oam.paletteNum, TRUE);
         }
+        for (i = 0; i < NUM_BADGES; ++i)
+        {
+            SetGrayscaleOrOriginalPalette(16 + gSprites[sBadgeSpriteIds[i]].oam.paletteNum, TRUE);
+        }
     }
     else
     {
@@ -479,6 +641,10 @@ static void ToggleGrayscaleAndAnims(void)
         {
             gSprites[sPartySpriteIds[i]].callback = SpriteCallbackDummy;
             SetGrayscaleOrOriginalPalette(16 + gSprites[sPartySpriteIds[i]].oam.paletteNum, FALSE);
+        }
+        for (i = 0; i < NUM_BADGES; ++i)
+        {
+            SetGrayscaleOrOriginalPalette(16 + gSprites[sBadgeSpriteIds[i]].oam.paletteNum, FALSE);
         }
     }
 }
